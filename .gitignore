@@ -9,3 +9,6 @@
 # 临时文件
 *.log
 tmp/
+
+# 微信开发者工具个人配置
+wxapp/project.private.config.json
