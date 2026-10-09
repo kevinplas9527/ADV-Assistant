@@ -37,19 +37,16 @@ body {
   padding: 8px 4px 20px;
 }
 
-.logo {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--primary), #4d8bff);
-  color: #fff;
-  font-weight: 800;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 1px;
+.logo-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 5px;
+  object-fit: contain;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(31, 39, 51, 0.08);
 }
 
 .app-header h1 {
