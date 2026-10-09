@@ -161,6 +161,37 @@ body {
   color: var(--primary);
 }
 
+/* 管材输入模式切换 */
+.mode-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-btn.active {
+  background: #eef3ff;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.mode-btn:hover:not(.active) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
 .hidden {
   display: none !important;
 }

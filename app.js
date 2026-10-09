@@ -8,6 +8,9 @@
   var plateForm = document.getElementById("form-plate");
   var rodForm = document.getElementById("form-rod");
   var tubeForm = document.getElementById("form-tube");
+  var modeBtns = document.querySelectorAll(".mode-btn");
+  var tubeOdId = document.getElementById("tube-od-id");
+  var tubeOdWall = document.getElementById("tube-od-wall");
   var calcBtn = document.getElementById("calc-btn");
   var resultBox = document.getElementById("result");
   var copyBtn = document.getElementById("copy-btn");
@@ -35,6 +38,7 @@
   };
 
   var currentShape = "plate";
+  var currentTubeMode = "od-id"; // od-id: 内外径, od-wall: 外径壁厚
 
   // ---------- 材料选择联动密度 ----------
   materialSelect.addEventListener("change", function () {
@@ -51,6 +55,22 @@
       rodForm.classList.add("hidden");
       tubeForm.classList.add("hidden");
       (currentShape === "plate" ? plateForm : currentShape === "rod" ? rodForm : tubeForm).classList.remove("hidden");
+    });
+  });
+
+  // ---------- 管材输入模式切换 ----------
+  modeBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      modeBtns.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      currentTubeMode = btn.getAttribute("data-tube-mode");
+      if (currentTubeMode === "od-id") {
+        tubeOdId.classList.remove("hidden");
+        tubeOdWall.classList.add("hidden");
+      } else {
+        tubeOdWall.classList.remove("hidden");
+        tubeOdId.classList.add("hidden");
+      }
     });
   });
 
@@ -89,17 +109,38 @@
       formula = "体积 = π×(直径/2)²×长度 = π×(" + d + "/2)²×" + rl + " mm³\n      = " + formatNum(volume) + " cm³";
 
     } else {
-      var od = num("tube-od"), idv = num("tube-id"), tl = num("tube-l");
-      if (od === null || idv === null || tl === null) {
-        alert("请完整填写管材的外径、内径和长度（mm）");
-        return;
+      var od, idv, tl;
+      if (currentTubeMode === "od-wall") {
+        od = num("tube-od2");
+        var wall = num("tube-wall");
+        tl = num("tube-l2");
+        if (od === null || wall === null || tl === null) {
+          alert("请完整填写管材的外径、壁厚和长度（mm）");
+          return;
+        }
+        if (od <= 2 * wall) {
+          alert("外径必须大于两倍壁厚");
+          return;
+        }
+        idv = od - 2 * wall; // 内径 = 外径 - 2×壁厚
+        volume = (Math.PI * (od * od - idv * idv) * tl) / 4000;
+        formula = "内径 = 外径-2×壁厚 = " + od + "-2×" + wall + " = " + formatNum(idv) + " mm\n" +
+                  "体积 = π×[(外径/2)²-(内径/2)²]×长度\n      = π×[(" + od + "/2)²-(" + idv + "/2)²]×" + tl + " mm³\n      = " + formatNum(volume) + " cm³";
+      } else {
+        od = num("tube-od");
+        idv = num("tube-id");
+        tl = num("tube-l");
+        if (od === null || idv === null || tl === null) {
+          alert("请完整填写管材的外径、内径和长度（mm）");
+          return;
+        }
+        if (idv >= od) {
+          alert("内径必须小于外径");
+          return;
+        }
+        volume = (Math.PI * (od * od - idv * idv) * tl) / 4000;
+        formula = "体积 = π×[(外径/2)²-(内径/2)²]×长度\n      = π×[(" + od + "/2)²-(" + idv + "/2)²]×" + tl + " mm³\n      = " + formatNum(volume) + " cm³";
       }
-      if (idv >= od) {
-        alert("内径必须小于外径");
-        return;
-      }
-      volume = (Math.PI * (od * od - idv * idv) * tl) / 4000;
-      formula = "体积 = π×[(外径/2)²-(内径/2)²]×长度\n      = π×[(" + od + "/2)²-(" + idv + "/2)²]×" + tl + " mm³\n      = " + formatNum(volume) + " cm³";
     }
 
     var weightKg = (volume * density) / 1000;      // g -> kg
