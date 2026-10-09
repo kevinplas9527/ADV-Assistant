@@ -165,7 +165,11 @@ body {
 /* 形态简笔图（CSS 绘制） */
 .shape-icon {
   position: relative;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  margin-bottom: 5px;
 }
 
 .shape-icon-plate {
@@ -191,20 +195,25 @@ body {
 }
 
 .shape-icon-rod {
-  width: 13px;
-  height: 28px;
+  width: 14px;
+  height: 27px;
   border: 1.5px solid currentColor;
-  border-radius: 7px;
+  border-radius: 8px;
   background: rgba(30, 94, 255, 0.10);
+  transform: rotate(45deg);
 }
 
 .shape-icon-rod::after {
   content: "";
   position: absolute;
   left: 50%;
-  top: 4px;
-  bottom: 4px;
-  border-left: 1px dashed currentColor;
+  top: 50%;
+  width: 11px;
+  height: 19px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.55;
 }
 
 .shape-icon-tube {

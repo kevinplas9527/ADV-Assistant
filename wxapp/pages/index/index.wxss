@@ -132,6 +132,10 @@ input,
 /* 形态简笔图（CSS 绘制） */
 .shape-icon {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64rpx;
   margin-bottom: 10rpx;
 }
 
@@ -158,20 +162,25 @@ input,
 }
 
 .shape-icon-rod {
-  width: 26rpx;
-  height: 56rpx;
+  width: 28rpx;
+  height: 54rpx;
   border: 3rpx solid currentColor;
-  border-radius: 14rpx;
+  border-radius: 15rpx;
   background: rgba(30, 94, 255, 0.10);
+  transform: rotate(45deg);
 }
 
 .shape-icon-rod::after {
   content: "";
   position: absolute;
   left: 50%;
-  top: 8rpx;
-  bottom: 8rpx;
-  border-left: 2rpx dashed currentColor;
+  top: 50%;
+  width: 22rpx;
+  height: 38rpx;
+  border: 2rpx solid currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.55;
 }
 
 .shape-icon-tube {
