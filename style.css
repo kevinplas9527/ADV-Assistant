@@ -292,44 +292,42 @@ body {
   color: #fff;
 }
 
-/* 反算尺寸 */
-.solve-tip {
-  font-size: 12px;
-  color: var(--text-light);
-  margin: 0 0 12px;
+/* 单件重量可编辑框（反算入口） */
+.result-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  text-align: center;
+  -webkit-appearance: none;
 }
 
-.solve-vars {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.result-input.edited {
+  color: #f08c00;
 }
 
-.solve-var-btn {
-  padding: 7px 12px;
-  border: 1px solid var(--primary);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--primary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
+.result-input::placeholder {
+  color: #b9c4d8;
+  font-size: 20px;
 }
 
-.solve-var-btn:hover {
-  background: #eef3ff;
+.solve-weight-item {
+  border-style: dashed;
 }
 
-.solve-result {
-  margin-top: 12px;
+/* 反算结果提示（蓝色加粗） */
+.solve-msg {
+  margin-bottom: 12px;
   padding: 10px 12px;
   border-radius: 8px;
-  background: #eef9f0;
-  border: 1px solid #bfe6c9;
-  color: #178a3f;
-  font-size: 13px;
-  font-weight: 600;
+  background: #eef3ff;
+  border: 1px solid #c9d8ff;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 /* 页脚 */

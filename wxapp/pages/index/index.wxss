@@ -255,43 +255,36 @@ input,
   border: none;
 }
 
-/* 反算尺寸 */
-.solve-tip {
-  font-size: 24rpx;
-  color: #6b7686;
+/* 单件重量可编辑框（反算入口） */
+.result-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #1748c9;
+  text-align: center;
+}
+
+.result-input.edited {
+  color: #f08c00;
+}
+
+.solve-weight-item {
+  border-style: dashed;
+}
+
+/* 反算结果提示（蓝色加粗） */
+.solve-msg {
   margin-bottom: 20rpx;
-}
-
-.solve-vars {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-}
-
-.solve-var-btn {
-  padding: 10rpx 22rpx;
-  border: 1rpx solid #1e5eff;
-  border-radius: 999rpx;
-  background: #fff;
-  color: #1e5eff;
-  font-size: 24rpx;
-  font-weight: 600;
-  line-height: 1.6;
-}
-
-.solve-var-btn:active {
-  background: #eef3ff;
-}
-
-.solve-result {
-  margin-top: 20rpx;
   padding: 16rpx 20rpx;
   border-radius: 12rpx;
-  background: #eef9f0;
-  border: 1rpx solid #bfe6c9;
-  color: #178a3f;
-  font-size: 25rpx;
-  font-weight: 600;
+  background: #eef3ff;
+  border: 1rpx solid #c9d8ff;
+  color: #1e5eff;
+  font-size: 28rpx;
+  font-weight: 700;
   line-height: 1.6;
 }
 

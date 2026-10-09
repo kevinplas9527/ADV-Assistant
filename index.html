@@ -153,15 +153,16 @@
         <h2>③ 计算结果</h2>
         <button id="calc-btn" class="calc-btn">计 算</button>
         <div id="result" class="result hidden">
+          <div id="solve-msg" class="solve-msg hidden"></div>
           <div class="result-grid">
             <div class="result-item">
               <div class="result-label">单件体积</div>
               <div class="result-value" id="res-volume">-</div>
               <div class="result-unit">cm³</div>
             </div>
-            <div class="result-item">
-              <div class="result-label">单件重量</div>
-              <div class="result-value" id="res-weight">-</div>
+            <div class="result-item solve-weight-item">
+              <div class="result-label">单件重量（可修改反算）</div>
+              <input type="number" id="target-weight" class="result-input" placeholder="22" min="0">
               <div class="result-unit">kg</div>
             </div>
             <div class="result-item">
@@ -178,23 +179,6 @@
           <div class="formula" id="res-formula"></div>
           <button id="copy-btn" class="ghost-btn hidden">复制结果</button>
         </div>
-      </section>
-
-      <!-- 反算尺寸 -->
-      <section class="card solve-card" id="solve-card">
-        <h2>④ 反算尺寸（可选）</h2>
-        <p class="solve-tip">已知重量反推尺寸：填目标重量，点一个变量自动反算并填入上方</p>
-        <div class="form-grid two">
-          <div class="field">
-            <label for="solve-weight">目标重量（kg）</label>
-            <input type="number" id="solve-weight" placeholder="如 20" min="0">
-          </div>
-          <div class="field">
-            <label>反算变量</label>
-            <div class="solve-vars" id="solve-vars"></div>
-          </div>
-        </div>
-        <div class="solve-result hidden" id="solve-result"></div>
       </section>
     </main>
 

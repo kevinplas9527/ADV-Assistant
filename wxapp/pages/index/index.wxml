@@ -124,15 +124,16 @@
     <view class="card-title">③ 计算结果</view>
     <button class="calc-btn" bindtap="onCalc">计 算</button>
     <view class="result" wx:if="{{showResult}}">
+      <view class="solve-msg" wx:if="{{solveMsg}}">{{solveMsg}}</view>
       <view class="result-grid">
         <view class="result-item">
           <view class="result-label">单件体积</view>
           <view class="result-value">{{volume}}</view>
           <view class="result-unit">cm³</view>
         </view>
-        <view class="result-item">
-          <view class="result-label">单件重量</view>
-          <view class="result-value">{{weight}}</view>
+        <view class="result-item solve-weight-item">
+          <view class="result-label">单件重量（可修改反算）</view>
+          <input class="result-input {{solveWeightEdited ? 'edited' : ''}}" type="digit" value="{{solveWeight}}" bindinput="onSolveWeightInput" />
           <view class="result-unit">kg</view>
         </view>
         <view class="result-item">
@@ -149,25 +150,6 @@
       <view class="formula">{{formula}}</view>
       <button class="ghost-btn" bindtap="onCopy">复制结果</button>
     </view>
-  </view>
-
-  <!-- 反算尺寸 -->
-  <view class="card solve-card" wx:if="{{showResult}}">
-    <view class="card-title">④ 反算尺寸（可选）</view>
-    <view class="solve-tip">已知重量反推尺寸：填目标重量，点一个变量自动反算并填入上方</view>
-    <view class="form-grid two">
-      <view class="field">
-        <view class="label">目标重量（kg）</view>
-        <input type="digit" value="{{solveWeight}}" bindinput="onSolveWeightInput" placeholder="如 20" />
-      </view>
-      <view class="field">
-        <view class="label">反算变量</view>
-        <view class="solve-vars">
-          <view wx:for="{{solveVars}}" wx:key="key" class="solve-var-btn" data-key="{{item.key}}" bindtap="onSolveVarTap">{{item.label}}</view>
-        </view>
-      </view>
-    </view>
-    <view class="solve-result" wx:if="{{solveResult}}">{{solveResult}}</view>
   </view>
 
   <view class="app-footer">
