@@ -255,6 +255,46 @@ input,
   border: none;
 }
 
+/* 反算尺寸 */
+.solve-tip {
+  font-size: 24rpx;
+  color: #6b7686;
+  margin-bottom: 20rpx;
+}
+
+.solve-vars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.solve-var-btn {
+  padding: 10rpx 22rpx;
+  border: 1rpx solid #1e5eff;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #1e5eff;
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.solve-var-btn:active {
+  background: #eef3ff;
+}
+
+.solve-result {
+  margin-top: 20rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background: #eef9f0;
+  border: 1rpx solid #bfe6c9;
+  color: #178a3f;
+  font-size: 25rpx;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
 /* 页脚 */
 .app-footer {
   text-align: center;

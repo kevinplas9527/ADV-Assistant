@@ -171,6 +171,11 @@
 
     resultBox.classList.remove("hidden");
     copyBtn.classList.remove("hidden");
+
+    // 反算区目标重量预填当前单件重量（用户手动输入过则保留）
+    if (!solveWeightTouched) {
+      solveWeight.value = String(Math.round(weightKg * 1000) / 1000);
+    }
   }
 
   function formatNum(n) {
@@ -221,5 +226,150 @@
     document.body.removeChild(ta);
     copyBtn.textContent = "已复制 ✓";
     setTimeout(function () { copyBtn.textContent = "复制结果"; }, 1500);
+  }
+
+  // ---------- 反算尺寸 ----------
+  var solveWeight = document.getElementById("solve-weight");
+  var solveVarsBox = document.getElementById("solve-vars");
+  var solveResultBox = document.getElementById("solve-result");
+  var solveWeightTouched = false;
+
+  var SOLVE_VARS = {
+    "plate": [
+      { key: "L", label: "反算长" },
+      { key: "W", label: "反算宽" },
+      { key: "T", label: "反算厚" }
+    ],
+    "rod": [
+      { key: "D", label: "反算直径" },
+      { key: "L", label: "反算长度" }
+    ],
+    "tube-od-id": [
+      { key: "OD", label: "反算外径" },
+      { key: "ID", label: "反算内径" },
+      { key: "L", label: "反算长度" }
+    ],
+    "tube-od-wall": [
+      { key: "OD", label: "反算外径" },
+      { key: "WALL", label: "反算壁厚" },
+      { key: "L", label: "反算长度" }
+    ]
+  };
+
+  function solveVarsKey() {
+    return currentShape === "tube" ? "tube-" + currentTubeMode : currentShape;
+  }
+
+  function renderSolveVars() {
+    var list = SOLVE_VARS[solveVarsKey()];
+    solveVarsBox.innerHTML = "";
+    list.forEach(function (v) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "solve-var-btn";
+      btn.textContent = v.label;
+      btn.addEventListener("click", function () { solve(v.key); });
+      solveVarsBox.appendChild(btn);
+    });
+  }
+  renderSolveVars();
+
+  // 形态/模式切换时同步反算变量按钮
+  var shapeHandler = function () {
+    renderSolveVars();
+    solveResultBox.classList.add("hidden");
+  };
+  shapeBtns.forEach(function (btn) {
+    btn.addEventListener("click", shapeHandler);
+  });
+  modeBtns.forEach(function (btn) {
+    btn.addEventListener("click", shapeHandler);
+  });
+
+  solveWeight.addEventListener("input", function () {
+    solveWeightTouched = true;
+    solveResultBox.classList.add("hidden");
+  });
+
+  function setInput(id, v) {
+    document.getElementById(id).value = String(Math.round(v * 1000) / 1000);
+  }
+
+  function solve(key) {
+    var density = parseFloat(densityInput.value);
+    var wTarget = parseFloat(solveWeight.value);
+    if (!isFinite(density) || density <= 0) {
+      alert("请先填写有效的密度值");
+      return;
+    }
+    if (!isFinite(wTarget) || wTarget <= 0) {
+      alert("请先填写目标重量（kg）");
+      return;
+    }
+    var V = (wTarget * 1000) / density; // 目标体积 cm³
+    var result = 0;
+    var hint = "";
+
+    if (currentShape === "plate") {
+      var pL = num("plate-l"), pW = num("plate-w"), pT = num("plate-t");
+      if (key === "L") {
+        if (pW === null || pT === null) { alert("请先填写宽度和厚度"); return; }
+        result = (V * 1000) / (pW * pT); setInput("plate-l", result); hint = "长度";
+      } else if (key === "W") {
+        if (pL === null || pT === null) { alert("请先填写长度和厚度"); return; }
+        result = (V * 1000) / (pL * pT); setInput("plate-w", result); hint = "宽度";
+      } else {
+        if (pL === null || pW === null) { alert("请先填写长度和宽度"); return; }
+        result = (V * 1000) / (pL * pW); setInput("plate-t", result); hint = "厚度";
+      }
+    } else if (currentShape === "rod") {
+      var rD = num("rod-d"), rL = num("rod-l");
+      if (key === "D") {
+        if (rL === null) { alert("请先填写长度"); return; }
+        result = Math.sqrt((4000 * V) / (Math.PI * rL)); setInput("rod-d", result); hint = "直径";
+      } else {
+        if (rD === null) { alert("请先填写直径"); return; }
+        result = (4000 * V) / (Math.PI * rD * rD); setInput("rod-l", result); hint = "长度";
+      }
+    } else {
+      var tOD, tID, tL;
+      if (currentTubeMode === "od-wall") {
+        tOD = num("tube-od2"); var tWall = num("tube-wall"); tL = num("tube-l2");
+        if (key === "OD") {
+          if (tWall === null || tL === null) { alert("请先填写壁厚和长度"); return; }
+          result = (1000 * V) / (Math.PI * tL * tWall) + tWall; setInput("tube-od2", result); hint = "外径";
+        } else if (key === "WALL") {
+          if (tOD === null || tL === null) { alert("请先填写外径和长度"); return; }
+          var sq = tOD * tOD - (4000 * V) / (Math.PI * tL);
+          if (sq <= 0) { alert("该重量在此外径和长度下无法实现，请调整外径/长度或目标重量"); return; }
+          result = (tOD - Math.sqrt(sq)) / 2; setInput("tube-wall", result); hint = "壁厚";
+        } else {
+          if (tOD === null || tWall === null) { alert("请先填写外径和壁厚"); return; }
+          var denom = 4 * tWall * (tOD - tWall);
+          if (denom <= 0) { alert("外径与壁厚组合无效（外径需大于两倍壁厚）"); return; }
+          result = (4000 * V) / (Math.PI * denom); setInput("tube-l2", result); hint = "长度";
+        }
+      } else {
+        tOD = num("tube-od"); tID = num("tube-id"); tL = num("tube-l");
+        if (key === "OD") {
+          if (tID === null || tL === null) { alert("请先填写内径和长度"); return; }
+          result = Math.sqrt(tID * tID + (4000 * V) / (Math.PI * tL)); setInput("tube-od", result); hint = "外径";
+        } else if (key === "ID") {
+          if (tOD === null || tL === null) { alert("请先填写外径和长度"); return; }
+          var sq2 = tOD * tOD - (4000 * V) / (Math.PI * tL);
+          if (sq2 <= 0) { alert("该重量在此外径和长度下无法实现，请调整外径/长度或目标重量"); return; }
+          result = Math.sqrt(sq2); setInput("tube-id", result); hint = "内径";
+        } else {
+          if (tOD === null || tID === null) { alert("请先填写外径和内径"); return; }
+          var d2 = tOD * tOD - tID * tID;
+          if (d2 <= 0) { alert("外径必须大于内径"); return; }
+          result = (4000 * V) / (Math.PI * d2); setInput("tube-l", result); hint = "长度";
+        }
+      }
+    }
+
+    solveResultBox.classList.remove("hidden");
+    solveResultBox.textContent = "✓ 反算" + hint + " = " + formatNum(result) + " mm（按目标 " + formatNum(wTarget) + " kg，已填入上方输入框）";
+    calc(); // 联动刷新计算结果
   }
 })();

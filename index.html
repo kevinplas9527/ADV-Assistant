@@ -179,6 +179,23 @@
           <button id="copy-btn" class="ghost-btn hidden">复制结果</button>
         </div>
       </section>
+
+      <!-- 反算尺寸 -->
+      <section class="card solve-card" id="solve-card">
+        <h2>④ 反算尺寸（可选）</h2>
+        <p class="solve-tip">已知重量反推尺寸：填目标重量，点一个变量自动反算并填入上方</p>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="solve-weight">目标重量（kg）</label>
+            <input type="number" id="solve-weight" placeholder="如 20" min="0">
+          </div>
+          <div class="field">
+            <label>反算变量</label>
+            <div class="solve-vars" id="solve-vars"></div>
+          </div>
+        </div>
+        <div class="solve-result hidden" id="solve-result"></div>
+      </section>
     </main>
 
     <footer class="app-footer">

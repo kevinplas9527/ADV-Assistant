@@ -292,6 +292,46 @@ body {
   color: #fff;
 }
 
+/* 反算尺寸 */
+.solve-tip {
+  font-size: 12px;
+  color: var(--text-light);
+  margin: 0 0 12px;
+}
+
+.solve-vars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.solve-var-btn {
+  padding: 7px 12px;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.solve-var-btn:hover {
+  background: #eef3ff;
+}
+
+.solve-result {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #eef9f0;
+  border: 1px solid #bfe6c9;
+  color: #178a3f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* 页脚 */
 .app-footer {
   text-align: center;
