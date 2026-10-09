@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADV小助手 · 工程塑料重量计算</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="logo">ADV</div>
+      <div>
+        <h1>工程塑料重量计算</h1>
+        <p class="subtitle">板 · 棒 · 管 重量与成本快速测算</p>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- 材料与形态 -->
+      <section class="card">
+        <h2>① 材料与形态</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label for="material">材料</label>
+            <select id="material">
+              <option value="2.20">PTFE 聚四氟乙烯</option>
+              <option value="2.15">PFA 全氟烷氧基树脂</option>
+              <option value="1.78">PVDF 聚偏氟乙烯</option>
+              <option value="1.32">PEEK 聚醚醚酮</option>
+              <option value="1.35">PPS 聚苯硫醚</option>
+              <option value="1.40">PI 聚酰亚胺</option>
+              <option value="1.41">POM 聚甲醛（赛钢）</option>
+              <option value="1.14">PA6 尼龙6</option>
+              <option value="1.15">PA66 尼龙66</option>
+              <option value="1.16">MC尼龙（铸型尼龙）</option>
+              <option value="1.20">PC 聚碳酸酯</option>
+              <option value="1.19">PMMA 亚克力</option>
+              <option value="1.05">ABS</option>
+              <option value="0.96">HDPE 高密度聚乙烯</option>
+              <option value="0.93">UHMWPE 超高分子量聚乙烯</option>
+              <option value="0.91">PP 聚丙烯</option>
+              <option value="1.45">PVC 硬质聚氯乙烯</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="density">密度（g/cm³）</label>
+            <input type="number" id="density" value="2.20" step="0.01" min="0.01">
+          </div>
+        </div>
+
+        <div class="shape-tabs">
+          <button class="shape-btn active" data-shape="plate">板材</button>
+          <button class="shape-btn" data-shape="rod">棒材</button>
+          <button class="shape-btn" data-shape="tube">管材</button>
+        </div>
+
+        <!-- 板材 -->
+        <div class="shape-form" id="form-plate">
+          <div class="form-grid three">
+            <div class="field">
+              <label for="plate-l">长（mm）</label>
+              <input type="number" id="plate-l" placeholder="如 1000" min="0">
+            </div>
+            <div class="field">
+              <label for="plate-w">宽（mm）</label>
+              <input type="number" id="plate-w" placeholder="如 500" min="0">
+            </div>
+            <div class="field">
+              <label for="plate-t">厚（mm）</label>
+              <input type="number" id="plate-t" placeholder="如 20" min="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- 棒材 -->
+        <div class="shape-form hidden" id="form-rod">
+          <div class="form-grid two">
+            <div class="field">
+              <label for="rod-d">直径（mm）</label>
+              <input type="number" id="rod-d" placeholder="如 50" min="0">
+            </div>
+            <div class="field">
+              <label for="rod-l">长度（mm）</label>
+              <input type="number" id="rod-l" placeholder="如 1000" min="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- 管材 -->
+        <div class="shape-form hidden" id="form-tube">
+          <div class="form-grid three">
+            <div class="field">
+              <label for="tube-od">外径（mm）</label>
+              <input type="number" id="tube-od" placeholder="如 100" min="0">
+            </div>
+            <div class="field">
+              <label for="tube-id">内径（mm）</label>
+              <input type="number" id="tube-id" placeholder="如 80" min="0">
+            </div>
+            <div class="field">
+              <label for="tube-l">长度（mm）</label>
+              <input type="number" id="tube-l" placeholder="如 1000" min="0">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 报价参数 -->
+      <section class="card">
+        <h2>② 报价参数（可选）</h2>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="price">材料单价（元/kg）</label>
+            <input type="number" id="price" placeholder="如 80" min="0">
+          </div>
+          <div class="field">
+            <label for="qty">数量（件）</label>
+            <input type="number" id="qty" value="1" min="1">
+          </div>
+        </div>
+      </section>
+
+      <!-- 结果 -->
+      <section class="card result-card">
+        <h2>③ 计算结果</h2>
+        <button id="calc-btn" class="calc-btn">计 算</button>
+        <div id="result" class="result hidden">
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">单件体积</div>
+              <div class="result-value" id="res-volume">-</div>
+              <div class="result-unit">cm³</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">单件重量</div>
+              <div class="result-value" id="res-weight">-</div>
+              <div class="result-unit">kg</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">总重量</div>
+              <div class="result-value" id="res-total-w">-</div>
+              <div class="result-unit">kg</div>
+            </div>
+            <div class="result-item" id="cost-item">
+              <div class="result-label">材料成本</div>
+              <div class="result-value" id="res-cost">-</div>
+              <div class="result-unit">元</div>
+            </div>
+          </div>
+          <div class="formula" id="res-formula"></div>
+          <button id="copy-btn" class="ghost-btn hidden">复制结果</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      ADV小助手 · 密度为常用参考值，请按实际牌号核对
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
