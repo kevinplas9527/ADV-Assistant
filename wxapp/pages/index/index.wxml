@@ -26,15 +26,15 @@
 
     <view class="shape-tabs">
       <view class="shape-btn {{shape === 'plate' ? 'active' : ''}}" data-shape="plate" bindtap="onShapeTap">
-        <view class="shape-icon shape-icon-plate"></view>
+        <image class="shape-icon" src="/images/icon-plate.png" mode="aspectFit"></image>
         <text class="shape-text">板材</text>
       </view>
       <view class="shape-btn {{shape === 'rod' ? 'active' : ''}}" data-shape="rod" bindtap="onShapeTap">
-        <view class="shape-icon shape-icon-rod"></view>
+        <image class="shape-icon" src="/images/icon-rod.png" mode="aspectFit"></image>
         <text class="shape-text">棒材</text>
       </view>
       <view class="shape-btn {{shape === 'tube' ? 'active' : ''}}" data-shape="tube" bindtap="onShapeTap">
-        <view class="shape-icon shape-icon-tube"></view>
+        <image class="shape-icon" src="/images/icon-tube.png" mode="aspectFit"></image>
         <text class="shape-text">管材</text>
       </view>
     </view>

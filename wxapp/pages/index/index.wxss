@@ -129,79 +129,11 @@ input,
   color: #1e5eff;
 }
 
-/* 形态简笔图（CSS 绘制） */
+/* 形态简笔图（3D 线框图标） */
 .shape-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 64rpx;
+  width: 72rpx;
+  height: 72rpx;
   margin-bottom: 10rpx;
-}
-
-.shape-icon-plate {
-  width: 66rpx;
-  height: 28rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 4rpx;
-  background: rgba(30, 94, 255, 0.10);
-  transform: skewX(-16deg);
-}
-
-.shape-icon-plate::after {
-  content: "";
-  position: absolute;
-  left: 12rpx;
-  top: -8rpx;
-  width: 66rpx;
-  height: 28rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 4rpx;
-  background: rgba(30, 94, 255, 0.06);
-  transform: skewX(16deg);
-}
-
-.shape-icon-rod {
-  width: 28rpx;
-  height: 54rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 15rpx;
-  background: rgba(30, 94, 255, 0.10);
-  transform: rotate(45deg);
-}
-
-.shape-icon-rod::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 22rpx;
-  height: 38rpx;
-  border: 2rpx solid currentColor;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.55;
-}
-
-.shape-icon-tube {
-  width: 50rpx;
-  height: 50rpx;
-  border: 7rpx solid currentColor;
-  border-radius: 50%;
-  background: rgba(30, 94, 255, 0.10);
-}
-
-.shape-icon-tube::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 26rpx;
-  height: 26rpx;
-  border: 3rpx solid currentColor;
-  border-radius: 50%;
-  background: #fff;
 }
 
 /* 管材模式切换 */
