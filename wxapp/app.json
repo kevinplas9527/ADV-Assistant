@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#1e5eff",
+    "navigationBarTitleText": "ADV小助手",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f0f4fa"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

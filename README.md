@@ -37,8 +37,25 @@
 
 ```
 ADV小助手/
-├── index.html    # 主页面
-├── style.css     # 样式
-├── app.js        # 计算逻辑
+├── index.html    # 网页版主页面（双击即用）
+├── style.css     # 网页版样式
+├── app.js        # 网页版计算逻辑
+├── assets/       # 网页版资源（公司 LOGO）
+├── wxapp/        # 微信小程序版（导入微信开发者工具即可运行）
+│   ├── app.json / app.js / app.wxss
+│   ├── project.config.json
+│   ├── images/logo.png
+│   └── pages/index/  （wxml/wxss/js）
 └── README.md     # 说明文档
 ```
+
+## 微信小程序版
+
+小程序代码位于 `wxapp/` 目录，使用原生小程序框架，功能与网页版一致（板/棒/管计算、管材双输入模式、成本测算、结果复制）。
+
+使用步骤：
+1. 在 [微信公众平台](https://mp.weixin.qq.com) 注册小程序账号（企业主体用营业执照，个人主体用身份证）
+2. 下载安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)（稳定版）
+3. 打开开发者工具 → 导入项目 → 选择 `wxapp/` 目录，填入你的小程序 AppID（暂无 AppID 可选"测试号"预览）
+4. 模拟器预览、真机扫码调试
+5. 工具栏「上传」→ 微信公众平台提交审核 → 审核通过后发布

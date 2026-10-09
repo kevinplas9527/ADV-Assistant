@@ -1,0 +1,146 @@
+<view class="app">
+  <!-- 头部 -->
+  <view class="app-header">
+    <image class="logo-img" src="/images/logo.png" mode="aspectFit"></image>
+    <view class="header-text">
+      <view class="title">工程塑料重量计算</view>
+      <view class="subtitle">板 · 棒 · 管 重量与成本快速测算</view>
+    </view>
+  </view>
+
+  <!-- 材料与形态 -->
+  <view class="card">
+    <view class="card-title">① 材料与形态</view>
+    <view class="form-grid">
+      <view class="field">
+        <view class="label">材料</view>
+        <picker range="{{materials}}" range-key="name" value="{{materialIndex}}" bindchange="onMaterialChange">
+          <view class="picker-value">{{materialName}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <view class="label">密度（g/cm³）</view>
+        <input type="digit" value="{{density}}" bindinput="onDensityInput" placeholder="2.20" />
+      </view>
+    </view>
+
+    <view class="shape-tabs">
+      <view class="shape-btn {{shape === 'plate' ? 'active' : ''}}" data-shape="plate" bindtap="onShapeTap">板材</view>
+      <view class="shape-btn {{shape === 'rod' ? 'active' : ''}}" data-shape="rod" bindtap="onShapeTap">棒材</view>
+      <view class="shape-btn {{shape === 'tube' ? 'active' : ''}}" data-shape="tube" bindtap="onShapeTap">管材</view>
+    </view>
+
+    <!-- 板材 -->
+    <view class="form-grid three" wx:if="{{shape === 'plate'}}">
+      <view class="field">
+        <view class="label">长（mm）</view>
+        <input type="digit" placeholder="如 1000" value="{{plateL}}" data-field="plateL" bindinput="onInput" />
+      </view>
+      <view class="field">
+        <view class="label">宽（mm）</view>
+        <input type="digit" placeholder="如 500" value="{{plateW}}" data-field="plateW" bindinput="onInput" />
+      </view>
+      <view class="field">
+        <view class="label">厚（mm）</view>
+        <input type="digit" placeholder="如 20" value="{{plateT}}" data-field="plateT" bindinput="onInput" />
+      </view>
+    </view>
+
+    <!-- 棒材 -->
+    <view class="form-grid two" wx:elif="{{shape === 'rod'}}">
+      <view class="field">
+        <view class="label">直径（mm）</view>
+        <input type="digit" placeholder="如 50" value="{{rodD}}" data-field="rodD" bindinput="onInput" />
+      </view>
+      <view class="field">
+        <view class="label">长度（mm）</view>
+        <input type="digit" placeholder="如 1000" value="{{rodL}}" data-field="rodL" bindinput="onInput" />
+      </view>
+    </view>
+
+    <!-- 管材 -->
+    <view wx:else>
+      <view class="mode-tabs">
+        <view class="mode-btn {{tubeMode === 'od-id' ? 'active' : ''}}" data-mode="od-id" bindtap="onTubeModeTap">按内外径</view>
+        <view class="mode-btn {{tubeMode === 'od-wall' ? 'active' : ''}}" data-mode="od-wall" bindtap="onTubeModeTap">按外径壁厚</view>
+      </view>
+      <view class="form-grid three" wx:if="{{tubeMode === 'od-id'}}">
+        <view class="field">
+          <view class="label">外径（mm）</view>
+          <input type="digit" placeholder="如 100" value="{{tubeOd}}" data-field="tubeOd" bindinput="onInput" />
+        </view>
+        <view class="field">
+          <view class="label">内径（mm）</view>
+          <input type="digit" placeholder="如 80" value="{{tubeId}}" data-field="tubeId" bindinput="onInput" />
+        </view>
+        <view class="field">
+          <view class="label">长度（mm）</view>
+          <input type="digit" placeholder="如 1000" value="{{tubeL}}" data-field="tubeL" bindinput="onInput" />
+        </view>
+      </view>
+      <view class="form-grid three" wx:else>
+        <view class="field">
+          <view class="label">外径（mm）</view>
+          <input type="digit" placeholder="如 100" value="{{tubeOd2}}" data-field="tubeOd2" bindinput="onInput" />
+        </view>
+        <view class="field">
+          <view class="label">壁厚（mm）</view>
+          <input type="digit" placeholder="如 10" value="{{tubeWall}}" data-field="tubeWall" bindinput="onInput" />
+        </view>
+        <view class="field">
+          <view class="label">长度（mm）</view>
+          <input type="digit" placeholder="如 1000" value="{{tubeL2}}" data-field="tubeL2" bindinput="onInput" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 报价参数 -->
+  <view class="card">
+    <view class="card-title">② 报价参数（可选）</view>
+    <view class="form-grid two">
+      <view class="field">
+        <view class="label">材料单价（元/kg）</view>
+        <input type="digit" placeholder="如 80" value="{{price}}" data-field="price" bindinput="onInput" />
+      </view>
+      <view class="field">
+        <view class="label">数量（件）</view>
+        <input type="number" placeholder="如 1" value="{{qty}}" data-field="qty" bindinput="onInput" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 结果 -->
+  <view class="card">
+    <view class="card-title">③ 计算结果</view>
+    <button class="calc-btn" bindtap="onCalc">计 算</button>
+    <view class="result" wx:if="{{showResult}}">
+      <view class="result-grid">
+        <view class="result-item">
+          <view class="result-label">单件体积</view>
+          <view class="result-value">{{volume}}</view>
+          <view class="result-unit">cm³</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">单件重量</view>
+          <view class="result-value">{{weight}}</view>
+          <view class="result-unit">kg</view>
+        </view>
+        <view class="result-item">
+          <view class="result-label">总重量</view>
+          <view class="result-value">{{totalWeight}}</view>
+          <view class="result-unit">kg</view>
+        </view>
+        <view class="result-item" wx:if="{{hasCost}}">
+          <view class="result-label">材料成本</view>
+          <view class="result-value">{{cost}}</view>
+          <view class="result-unit">元</view>
+        </view>
+      </view>
+      <view class="formula">{{formula}}</view>
+      <button class="ghost-btn" bindtap="onCopy">复制结果</button>
+    </view>
+  </view>
+
+  <view class="app-footer">ADV小助手 · 密度为常用参考值，请按实际牌号核对</view>
+</view>
