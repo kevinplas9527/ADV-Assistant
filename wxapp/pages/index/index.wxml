@@ -25,9 +25,18 @@
     </view>
 
     <view class="shape-tabs">
-      <view class="shape-btn {{shape === 'plate' ? 'active' : ''}}" data-shape="plate" bindtap="onShapeTap">板材</view>
-      <view class="shape-btn {{shape === 'rod' ? 'active' : ''}}" data-shape="rod" bindtap="onShapeTap">棒材</view>
-      <view class="shape-btn {{shape === 'tube' ? 'active' : ''}}" data-shape="tube" bindtap="onShapeTap">管材</view>
+      <view class="shape-btn {{shape === 'plate' ? 'active' : ''}}" data-shape="plate" bindtap="onShapeTap">
+        <view class="shape-icon shape-icon-plate"></view>
+        <text class="shape-text">板材</text>
+      </view>
+      <view class="shape-btn {{shape === 'rod' ? 'active' : ''}}" data-shape="rod" bindtap="onShapeTap">
+        <view class="shape-icon shape-icon-rod"></view>
+        <text class="shape-text">棒材</text>
+      </view>
+      <view class="shape-btn {{shape === 'tube' ? 'active' : ''}}" data-shape="tube" bindtap="onShapeTap">
+        <view class="shape-icon shape-icon-tube"></view>
+        <text class="shape-text">管材</text>
+      </view>
     </view>
 
     <!-- 板材 -->
@@ -142,5 +151,8 @@
     </view>
   </view>
 
-  <view class="app-footer">ADV小助手 · 密度为常用参考值，请按实际牌号核对</view>
+  <view class="app-footer">
+    <view class="slogan">advanced plastics for better life</view>
+    <view class="footer-note">ADV小助手 · 密度为常用参考值，请按实际牌号核对</view>
+  </view>
 </view>

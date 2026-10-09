@@ -104,19 +104,95 @@ input,
 .shape-btn {
   flex: 1;
   text-align: center;
-  padding: 20rpx 0;
+  padding: 20rpx 0 16rpx;
   border: 1rpx solid #dde3ec;
   border-radius: 16rpx;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #6b7686;
+  color: #1e5eff;
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .shape-btn.active {
-  background: #1e5eff;
+  background: #eef3ff;
   border-color: #1e5eff;
-  color: #fff;
+}
+
+.shape-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #6b7686;
+}
+
+.shape-btn.active .shape-text {
+  color: #1e5eff;
+}
+
+/* 形态简笔图（CSS 绘制） */
+.shape-icon {
+  position: relative;
+  margin-bottom: 10rpx;
+}
+
+.shape-icon-plate {
+  width: 66rpx;
+  height: 28rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 4rpx;
+  background: rgba(30, 94, 255, 0.10);
+  transform: skewX(-16deg);
+}
+
+.shape-icon-plate::after {
+  content: "";
+  position: absolute;
+  left: 12rpx;
+  top: -8rpx;
+  width: 66rpx;
+  height: 28rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 4rpx;
+  background: rgba(30, 94, 255, 0.06);
+  transform: skewX(16deg);
+}
+
+.shape-icon-rod {
+  width: 26rpx;
+  height: 56rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 14rpx;
+  background: rgba(30, 94, 255, 0.10);
+}
+
+.shape-icon-rod::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 8rpx;
+  bottom: 8rpx;
+  border-left: 2rpx dashed currentColor;
+}
+
+.shape-icon-tube {
+  width: 50rpx;
+  height: 50rpx;
+  border: 7rpx solid currentColor;
+  border-radius: 50%;
+  background: rgba(30, 94, 255, 0.10);
+}
+
+.shape-icon-tube::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 26rpx;
+  height: 26rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+  background: #fff;
 }
 
 /* 管材模式切换 */
@@ -241,7 +317,24 @@ input,
 /* 页脚 */
 .app-footer {
   text-align: center;
+  padding: 16rpx 0 32rpx;
+}
+
+.slogan {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+  background: linear-gradient(90deg, #1e5eff, #7aa5ff 50%, #1e5eff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #1e5eff;
+}
+
+.footer-note {
   font-size: 24rpx;
   color: #6b7686;
-  padding: 8rpx 0 24rpx;
+  margin-top: 10rpx;
 }

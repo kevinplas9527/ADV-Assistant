@@ -136,26 +136,96 @@ body {
 
 .shape-btn {
   flex: 1;
-  padding: 10px 0;
+  padding: 12px 0 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #fff;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-light);
+  color: var(--primary);
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
 .shape-btn.active {
-  background: var(--primary);
+  background: #eef3ff;
   border-color: var(--primary);
-  color: #fff;
+  color: var(--primary);
 }
 
 .shape-btn:hover:not(.active) {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+/* 形态简笔图（CSS 绘制） */
+.shape-icon {
+  position: relative;
+  display: block;
+}
+
+.shape-icon-plate {
+  width: 33px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  background: rgba(30, 94, 255, 0.10);
+  transform: skewX(-16deg);
+}
+
+.shape-icon-plate::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: -4px;
+  width: 33px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  background: rgba(30, 94, 255, 0.06);
+  transform: skewX(16deg);
+}
+
+.shape-icon-rod {
+  width: 13px;
+  height: 28px;
+  border: 1.5px solid currentColor;
+  border-radius: 7px;
+  background: rgba(30, 94, 255, 0.10);
+}
+
+.shape-icon-rod::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  bottom: 4px;
+  border-left: 1px dashed currentColor;
+}
+
+.shape-icon-tube {
+  width: 25px;
+  height: 25px;
+  border: 3.5px solid currentColor;
+  border-radius: 50%;
+  background: rgba(30, 94, 255, 0.10);
+}
+
+.shape-icon-tube::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: #fff;
 }
 
 /* 管材输入模式切换 */
@@ -283,9 +353,26 @@ body {
 /* 页脚 */
 .app-footer {
   text-align: center;
+  padding-top: 12px;
+}
+
+.slogan {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, var(--primary), #7aa5ff 50%, var(--primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--primary);
+}
+
+.footer-note {
   font-size: 12px;
   color: var(--text-light);
-  padding-top: 8px;
+  margin-top: 6px;
 }
 
 @media (max-width: 520px) {
