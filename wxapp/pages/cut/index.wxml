@@ -46,6 +46,13 @@
           <input placeholder-class="input-ph" type="digit" value="{{kerf}}" data-field="kerf" bindinput="onInput" placeholder="{{kerfPlaceholder}}" />
         </view>
       </view>
+      <!-- 板材 3D 模型示意（随输入实时更新） -->
+      <view class="plate-model">
+        <image class="pm-img" src="/images/icon-plate.png" mode="aspectFit"></image>
+        <view class="pm-dim pm-l">长 {{plateL || '—'}}</view>
+        <view class="pm-dim pm-w">宽 {{plateW || '—'}}</view>
+        <view class="pm-dim pm-t">厚 {{cutThickness || '—'}}</view>
+      </view>
       <view class="form-grid">
         <view class="field" style="flex: 1">
           <view class="label">目标块数（反算用）</view>
