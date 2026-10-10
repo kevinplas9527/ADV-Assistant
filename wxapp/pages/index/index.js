@@ -1,3 +1,5 @@
+const { parseVoice } = require("../../utils/voice.js");
+
 const MATERIALS = [
   { name: "PTFE 聚四氟乙烯", density: 2.20 },
   { name: "PFA 全氟烷氧基树脂", density: 2.15 },
@@ -17,6 +19,43 @@ const MATERIALS = [
   { name: "PP 聚丙烯", density: 0.91 },
   { name: "PVC 硬质聚氯乙烯", density: 1.45 }
 ];
+
+// 语音识别插件（同声传译 WechatSI）；插件未就绪时降级提示
+let voicePlugin = null;
+try {
+  voicePlugin = requirePlugin("WechatSI");
+} catch (e) {
+  voicePlugin = null;
+}
+
+// 按当前形态/管材模式生成字段映射
+function voiceSchema(shape, tubeMode) {
+  if (shape === "plate") {
+    return [
+      { keys: ["长", "长度"], field: "plateL", label: "长" },
+      { keys: ["宽", "宽度"], field: "plateW", label: "宽" },
+      { keys: ["厚", "厚度"], field: "plateT", label: "厚" }
+    ];
+  }
+  if (shape === "rod") {
+    return [
+      { keys: ["直径", "径"], field: "rodD", label: "直径" },
+      { keys: ["长", "长度"], field: "rodL", label: "长度" }
+    ];
+  }
+  if (tubeMode === "od-wall") {
+    return [
+      { keys: ["外径"], field: "tubeOd2", label: "外径" },
+      { keys: ["壁厚"], field: "tubeWall", label: "壁厚" },
+      { keys: ["长", "长度"], field: "tubeL2", label: "长度" }
+    ];
+  }
+  return [
+    { keys: ["外径"], field: "tubeOd", label: "外径" },
+    { keys: ["内径"], field: "tubeId", label: "内径" },
+    { keys: ["长", "长度"], field: "tubeL", label: "长度" }
+  ];
+}
 
 Page({
   data: {
@@ -49,7 +88,75 @@ Page({
     solveWeight: "",
     solveWeightEdited: false,
     solveMsg: "",
-    solveMsgWarn: false
+    solveMsgWarn: false,
+    voiceState: "idle",
+    voiceText: "",
+    voiceTip: ""
+  },
+
+  onLoad() {
+    if (!voicePlugin) return;
+    this.voiceManager = voicePlugin.getRecordRecognitionManager();
+    this.voiceManager.onStart = () => {
+      this.setData({ voiceState: "rec", voiceText: "", voiceTip: "" });
+    };
+    this.voiceManager.onRecognize = (res) => {
+      this.setData({ voiceText: res.result || "" });
+    };
+    this.voiceManager.onStop = (res) => {
+      this.handleVoiceResult((res && res.result) || "");
+    };
+    this.voiceManager.onError = (res) => {
+      this.setData({ voiceState: "idle", voiceTip: "语音识别失败：" + ((res && res.msg) || "请重试") });
+    };
+  },
+
+  // 语音输入：点击开始/停止
+  onVoiceTap() {
+    if (!this.voiceManager) {
+      wx.showToast({ title: "语音插件未就绪，请先在公众平台添加「同声传译」插件", icon: "none", duration: 2500 });
+      return;
+    }
+    if (this.data.voiceState === "rec") {
+      this.voiceManager.stop();
+      return;
+    }
+    const startRec = () => {
+      this.voiceManager.start({ duration: 30000, lang: "zh_CN" });
+    };
+    wx.getSetting({
+      success: (r) => {
+        if (!r.authSetting["scope.record"]) {
+          wx.authorize({
+            scope: "scope.record",
+            success: startRec,
+            fail: () => {
+              wx.showModal({ title: "需要麦克风权限", content: "请允许使用麦克风后，再尝试语音输入", showCancel: false });
+            }
+          });
+        } else {
+          startRec();
+        }
+      }
+    });
+  },
+
+  // 识别完成：解析并填入对应输入框
+  handleVoiceResult(text) {
+    if (!text) {
+      this.setData({ voiceState: "idle", voiceTip: "未听清，请再说一次" });
+      return;
+    }
+    const schema = voiceSchema(this.data.shape, this.data.tubeMode);
+    const { values, labels } = parseVoice(text, schema);
+    if (Object.keys(values).length === 0) {
+      this.setData({ voiceState: "idle", voiceTip: "未识别到参数，试试说：长1000，宽500，厚30" });
+      return;
+    }
+    this.setData(Object.assign({}, values, { voiceState: "done", voiceTip: "已填入：" + labels.join(" / ") }));
+    setTimeout(() => {
+      this.setData({ voiceState: "idle", voiceTip: "" });
+    }, 3000);
   },
 
   onMaterialChange(e) {

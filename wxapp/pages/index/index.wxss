@@ -84,6 +84,89 @@
   margin-bottom: 14rpx;
 }
 
+/* 卡片标题行（语音按钮） */
+.card-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.card-hd .card-title {
+  margin-bottom: 0;
+}
+
+.mic-btn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #eef3ff;
+  border: 1.5rpx solid #1e5eff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mic-ico {
+  width: 34rpx;
+  height: 34rpx;
+}
+
+.mic-btn.rec {
+  background: #fff2e0;
+  border-color: #e8590c;
+}
+
+.mic-btn.done {
+  background: #e6f7ee;
+  border-color: #23a55a;
+}
+
+/* 语音状态条 */
+.voice-bar {
+  margin-bottom: 12rpx;
+  padding: 10rpx 14rpx;
+  border-radius: 12rpx;
+  background: #f5f7fb;
+}
+
+.voice-state {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #6b7686;
+}
+
+.voice-state.rec {
+  color: #e8590c;
+}
+
+.voice-state.done {
+  color: #23a55a;
+}
+
+.vdot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #e8590c;
+  animation: vblink 0.8s infinite;
+}
+
+@keyframes vblink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.voice-text {
+  margin-top: 6rpx;
+  font-size: 26rpx;
+  color: #1b2a4a;
+}
+
 /* 表单 */
 .form-grid {
   display: flex;

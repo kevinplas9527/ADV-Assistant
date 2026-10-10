@@ -16,7 +16,22 @@
 
   <!-- 材料与形态 -->
   <view class="card">
-    <view class="card-title">① 材料与形态</view>
+    <view class="card-hd">
+      <view class="card-title">① 材料与形态</view>
+      <view class="mic-btn {{voiceState === 'rec' ? 'rec' : ''}} {{voiceState === 'done' ? 'done' : ''}}" bindtap="onVoiceTap">
+        <image wx:if="{{voiceState === 'done'}}" class="mic-ico" src="/images/ico-mic-ok.png" mode="aspectFit"></image>
+        <image wx:else class="mic-ico" src="/images/ico-mic.png" mode="aspectFit"></image>
+      </view>
+    </view>
+    <view class="voice-bar" wx:if="{{voiceState === 'rec' || voiceState === 'done' || voiceTip}}">
+      <view class="voice-state {{voiceState === 'rec' ? 'rec' : ''}} {{voiceState === 'done' ? 'done' : ''}}">
+        <view class="vdot" wx:if="{{voiceState === 'rec'}}"></view>
+        <text wx:if="{{voiceState === 'rec'}}">正在聆听，说参数即可，说完自动停止…</text>
+        <text wx:elif="{{voiceState === 'done'}}">{{voiceTip}}</text>
+        <text wx:else>{{voiceTip}}</text>
+      </view>
+      <view class="voice-text" wx:if="{{voiceText}}">{{voiceText}}</view>
+    </view>
     <view class="form-grid">
       <view class="field">
         <view class="label">材料</view>
