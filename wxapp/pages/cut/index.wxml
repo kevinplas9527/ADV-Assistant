@@ -45,7 +45,7 @@
   <view class="card" wx:if="{{showResult}}">
     <view class="card-title">② 测算结果</view>
     <view class="solve-msg {{cutMsgWarn ? 'warn' : ''}}" wx:if="{{cutMsg}}">{{cutMsg}}</view>
-    <view class="cut-count">可切 <text class="cut-num">{{count}}</text> 块</view>
+    <view class="cut-count">可切 <text class="cut-num">{{count}}</text> 块<text class="cut-target" wx:if="{{targetShow}}">{{targetShow}}</text></view>
     <view class="cut-meta">排样：{{mode}} ｜ 板材 {{plateL}}×{{plateW}} mm ｜ 单块 {{blockL}}×{{blockW}} mm ｜ 刀缝 {{kerf}} mm</view>
     <view class="cut-meta">材料利用率 {{ratio}}% ｜ 余料 {{waste}} mm²</view>
     <view class="cut-legend">

@@ -564,7 +564,7 @@
   }
 
   // 常规测算：跑排样 + 展示结果与示意图
-  function runCut(W, H, bw, bh, kerf, msg, keepMsg) {
+  function runCut(W, H, bw, bh, kerf, msg, keepMsg, targetText) {
     if (bw > W && bh > W && bw > H && bh > H) {
       alert("块尺寸大于板材，无法切割");
       return;
@@ -576,7 +576,8 @@
     }
     var areaRatio = (best.count * bw * bh) / (W * H);
     document.getElementById("cut-summary").innerHTML =
-      "<div class='cut-count'>可切 <b>" + best.count + "</b> 块</div>" +
+      "<div class='cut-count'>可切 <b>" + best.count + "</b> 块" +
+      (targetText ? " <span class='cut-target'>" + targetText + "</span>" : "") + "</div>" +
       "<div class='cut-meta'>排样：" + best.mode + " ｜ 板材 " + W + "×" + H + " mm ｜ 单块 " + bw + "×" + bh + " mm ｜ 刀缝 " + kerf + " mm</div>" +
       "<div class='cut-meta'>材料利用率 " + (areaRatio * 100).toFixed(1) + "% ｜ 余料 " + formatNum(W * H - best.count * bw * bh) + " mm²</div>";
     document.getElementById("cut-result-card").classList.remove("hidden");
@@ -637,9 +638,10 @@
       cutMsg.textContent = "✓ 反算" + missName + " = " + formatNum(need) + " mm（按目标 " + targetN + " 块，最小需）";
       var newW = W === null ? need : W;
       var newH = H === null ? need : H;
-      runCut(newW, newH, bw, bh, kerf, "", true);
-      // 反算成功自动复位：目标块数回归常规色，下次默认常规测算
+      // 反算成功后：清空目标块数、复位颜色，结果区显示目标
+      cutTargetN.value = "";
       cutTargetN.classList.remove("edited");
+      runCut(newW, newH, bw, bh, kerf, "", true, "（目标 " + targetN + " 块）");
       return;
     }
 

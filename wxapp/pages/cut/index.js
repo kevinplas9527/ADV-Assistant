@@ -9,6 +9,7 @@ Page({
     targetNEdited: false,
     cutMsg: "",
     cutMsgWarn: false,
+    targetShow: "",
     showResult: false,
     count: 0,
     mode: "",
@@ -219,7 +220,7 @@ Page({
   },
 
   // 常规测算：排样 + 展示结果与示意图
-  runCut(W, H, bw, bh, kerf, msg, keepMsg) {
+  runCut(W, H, bw, bh, kerf, msg, keepMsg, targetText) {
     if ((bw > W && bh > W) && (bw > H && bh > H)) {
       wx.showToast({ title: "块尺寸大于板材，无法切割", icon: "none" });
       return;
@@ -239,7 +240,8 @@ Page({
       waste: waste.toLocaleString("zh-CN"),
       canvasHeight: 0,
       cutMsg: msg || (keepMsg ? this.data.cutMsg : ""),
-      cutMsgWarn: !!msg && msg.indexOf("目标块数用于反算") !== -1
+      cutMsgWarn: !!msg && msg.indexOf("目标块数用于反算") !== -1,
+      targetShow: targetText || ""
     });
     // 等 canvas 渲染后初始化节点并绘制
     setTimeout(() => this.initCanvasAndDraw(best.blocks, W, H), 120);
@@ -289,9 +291,9 @@ Page({
       this.setData(patch);
       const newW = W === null ? need : W;
       const newH = H === null ? need : H;
-      this.runCut(newW, newH, bw, bh, kerf, "", true);
-      // 反算成功自动复位：目标块数回归常规色，下次默认常规测算
-      this.setData({ targetNEdited: false });
+      // 反算成功后：清空目标块数、复位颜色，结果区显示目标
+      this.setData({ targetN: "", targetNEdited: false });
+      this.runCut(newW, newH, bw, bh, kerf, "", true, "（目标 " + targetN + " 块）");
       return;
     }
 

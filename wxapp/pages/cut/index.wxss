@@ -132,6 +132,13 @@
   font-weight: 800;
 }
 
+.cut-target {
+  font-size: 26rpx;
+  color: #6b7686;
+  font-weight: 400;
+  margin-left: 8rpx;
+}
+
 .cut-meta {
   font-size: 24rpx;
   color: #6b7686;
