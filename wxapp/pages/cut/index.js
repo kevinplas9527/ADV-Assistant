@@ -422,20 +422,19 @@ Page({
     return bestLen;
   },
 
-  // canvas 渲染完成后初始化节点并绘制示意图
+  // canvas 渲染完成后初始化节点并绘制示意图（真机 wx:if 渲染慢，放宽重试）
   initCanvasAndDraw(blocks, W, H) {
     const query = wx.createSelectorQuery().in(this);
     query.select("#cutCanvas").fields({ node: true, size: true }).exec((res) => {
       if (res && res[0] && res[0].node) {
         this.canvas = res[0].node;
         this.ctx = this.canvas.getContext("2d");
-        this.canvasCssWidth = res[0].width;
+        this.canvasCssWidth = res[0].width || 320;
         this.drawCut(blocks, W, H);
       } else {
-        // 节点尚未渲染（wx:if 刚置 true），稍后重试
         this._retry = (this._retry || 0) + 1;
-        if (this._retry <= 3) {
-          setTimeout(() => this.initCanvasAndDraw(blocks, W, H), 120);
+        if (this._retry <= 6) {
+          setTimeout(() => this.initCanvasAndDraw(blocks, W, H), 150);
         }
       }
     });
@@ -568,12 +567,12 @@ Page({
       if (res && res[0] && res[0].node) {
         this.rodCanvas = res[0].node;
         this.rodCtx = this.rodCanvas.getContext("2d");
-        this.rodCanvasCssWidth = res[0].width;
+        this.rodCanvasCssWidth = res[0].width || 320;
         this.drawRod(n, L, p, clamp, k);
       } else {
         this._rodRetry = (this._rodRetry || 0) + 1;
-        if (this._rodRetry <= 3) {
-          setTimeout(() => this.initRodCanvasAndDraw(n, L, p, clamp, k), 120);
+        if (this._rodRetry <= 6) {
+          setTimeout(() => this.initRodCanvasAndDraw(n, L, p, clamp, k), 150);
         }
       }
     });
@@ -589,11 +588,17 @@ Page({
     const dpr = info.pixelRatio || 2;
     const cssW = this.rodCanvasCssWidth || 320;
     const cssH = 80;
+    // 两段式：先设置 CSS 高度，渲染完成后再次进入真正绘制
+    if (this.data.rodCanvasHeight !== cssH) {
+      this.setData({ rodCanvasHeight: cssH }, () => {
+        setTimeout(() => this.drawRod(n, L, p, clamp, k), 30);
+      });
+      return;
+    }
     const pw = Math.round(cssW * dpr);
     const ph = Math.round(cssH * dpr);
     this.rodCanvas.width = pw;
     this.rodCanvas.height = ph;
-    this.setData({ rodCanvasHeight: cssH });
 
     const ctx = this.rodCtx;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -706,9 +711,16 @@ Page({
     const ratio = H / W;
     const pw = Math.round(cssW * dpr);
     const ph = Math.max(200, Math.round(pw * ratio));
+    const cssH = Math.round(ph / dpr);
+    // 两段式：先设置 CSS 高度，等渲染完成后再次进入真正绘制（避免高度为 0 画了看不见）
+    if (this.data.canvasHeight !== cssH) {
+      this.setData({ canvasHeight: cssH }, () => {
+        setTimeout(() => this.drawCut(blocks, W, H), 30);
+      });
+      return;
+    }
     this.canvas.width = pw;
     this.canvas.height = ph;
-    this.setData({ canvasHeight: Math.round(ph / dpr) });
 
     const ctx = this.ctx;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
