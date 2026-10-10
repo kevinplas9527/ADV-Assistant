@@ -92,6 +92,24 @@
   opacity: 0.85;
 }
 
+/* 反算目标块数（橙色） */
+.field input.edited {
+  color: #f08c00;
+}
+
+/* 反算结果提示（蓝色加粗） */
+.solve-msg {
+  margin-bottom: 20rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background: #eef3ff;
+  border: 1rpx solid #c9d8ff;
+  color: #1e5eff;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 /* 结果 */
 .cut-count {
   font-size: 30rpx;

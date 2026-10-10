@@ -522,6 +522,61 @@
   }
 
   var cutBtn = document.getElementById("cut-btn");
+  var cutMsg = document.getElementById("cut-msg");
+  var cutTargetN = document.getElementById("cut-target-n");
+
+  // 修改目标块数 → 进入反算模式（橙色提示）
+  cutTargetN.addEventListener("input", function () {
+    cutTargetN.classList.add("edited");
+    cutMsg.classList.add("hidden");
+  });
+
+  // 反算板材长/宽：已知一个方向尺寸，按直排求另一方向最小长度
+  function minLength(fixedLen, N, bw, bh, kerf) {
+    var bestLen = null;
+    // 方案A：固定方向排 bh 高（正向块）
+    var rows = cutNum(fixedLen, bh, kerf);
+    if (rows > 0) {
+      var cols = Math.ceil(N / rows);
+      var len = cols * bw + (cols - 1) * kerf;
+      if (bestLen === null || len < bestLen) bestLen = len;
+    }
+    // 方案B：固定方向排 bw 高（旋转块）
+    var rows2 = cutNum(fixedLen, bw, kerf);
+    if (rows2 > 0) {
+      var cols2 = Math.ceil(N / rows2);
+      var len2 = cols2 * bh + (cols2 - 1) * kerf;
+      if (bestLen === null || len2 < bestLen) bestLen = len2;
+    }
+    return bestLen;
+  }
+
+  // 常规测算：跑排样 + 展示结果与示意图
+  function runCut(W, H, bw, bh, kerf, msg, keepMsg) {
+    if (bw > W && bh > W && bw > H && bh > H) {
+      alert("块尺寸大于板材，无法切割");
+      return;
+    }
+    var best = bestCut(W, H, bw, bh, kerf);
+    if (best.count === 0) {
+      alert("无法放下任何一块，请检查尺寸");
+      return;
+    }
+    var areaRatio = (best.count * bw * bh) / (W * H);
+    document.getElementById("cut-summary").innerHTML =
+      "<div class='cut-count'>可切 <b>" + best.count + "</b> 块</div>" +
+      "<div class='cut-meta'>排样：" + best.mode + " ｜ 板材 " + W + "×" + H + " mm ｜ 单块 " + bw + "×" + bh + " mm ｜ 刀缝 " + kerf + " mm</div>" +
+      "<div class='cut-meta'>材料利用率 " + (areaRatio * 100).toFixed(1) + "% ｜ 余料 " + formatNum(W * H - best.count * bw * bh) + " mm²</div>";
+    document.getElementById("cut-result-card").classList.remove("hidden");
+    if (msg) {
+      cutMsg.classList.remove("hidden");
+      cutMsg.textContent = msg;
+    } else if (!keepMsg) {
+      cutMsg.classList.add("hidden");
+    }
+    drawCutCanvas(best.blocks, W, H);
+  }
+
   cutBtn.addEventListener("click", function () {
     var W = num("cut-plate-l");
     var H = num("cut-plate-w");
@@ -530,28 +585,49 @@
     var kerf = parseFloat(document.getElementById("cut-kerf").value);
     if (!isFinite(kerf)) kerf = 0;
     if (kerf < 0) kerf = 0;
+    var targetN = parseInt(document.getElementById("cut-target-n").value, 10);
+    var hasTarget = isFinite(targetN) && targetN > 0;
 
-    if (W === null || H === null || bw === null || bh === null) {
-      alert("请完整填写板材尺寸、块尺寸和刀缝（mm）");
-      return;
-    }
-    if (bw > W && bh > W && bw > H && bh > H) {
-      alert("块尺寸大于板材，无法切割");
-      return;
-    }
-
-    var best = bestCut(W, H, bw, bh, kerf);
-    if (best.count === 0) {
-      alert("无法放下任何一块，请检查尺寸");
+    if (bw === null || bh === null) {
+      alert("请填写块长和块宽（mm）");
       return;
     }
 
-    var areaRatio = (best.count * bw * bh) / (W * H);
-    document.getElementById("cut-summary").innerHTML =
-      "<div class='cut-count'>可切 <b>" + best.count + "</b> 块</div>" +
-      "<div class='cut-meta'>排样：" + best.mode + " ｜ 板材 " + W + "×" + H + " mm ｜ 单块 " + bw + "×" + bh + " mm ｜ 刀缝 " + kerf + " mm</div>" +
-      "<div class='cut-meta'>材料利用率 " + (areaRatio * 100).toFixed(1) + "% ｜ 余料 " + formatNum(W * H - best.count * bw * bh) + " mm²</div>";
-    document.getElementById("cut-result-card").classList.remove("hidden");
-    drawCutCanvas(best.blocks, W, H);
+    var missing = (W === null ? 1 : 0) + (H === null ? 1 : 0);
+
+    if (missing === 0) {
+      if (hasTarget) {
+        runCut(W, H, bw, bh, kerf, "目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸");
+      } else {
+        cutTargetN.classList.remove("edited");
+        runCut(W, H, bw, bh, kerf, "");
+      }
+      return;
+    }
+
+    if (missing === 1 && hasTarget) {
+      var fixed = W === null ? H : W;
+      var need = minLength(fixed, targetN, bw, bh, kerf);
+      if (need === null) {
+        alert("固定方向的板材尺寸不足以排下任意一块");
+        return;
+      }
+      var missName = W === null ? "板材长" : "板材宽";
+      var missId = W === null ? "cut-plate-l" : "cut-plate-w";
+      document.getElementById(missId).value = String(Math.round(need * 1000) / 1000);
+      cutMsg.classList.remove("hidden");
+      cutMsg.textContent = "✓ 反算" + missName + " = " + formatNum(need) + " mm（按目标 " + targetN + " 块，最小需）";
+      var newW = W === null ? need : W;
+      var newH = H === null ? need : H;
+      runCut(newW, newH, bw, bh, kerf, "", true);
+      return;
+    }
+
+    if (missing > 1) {
+      alert("反算时只能留空板材长或板材宽之一");
+      return;
+    }
+
+    alert("请输入目标块数后再反算（修改目标块数并留空板材长或板材宽）");
   });
 })();

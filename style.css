@@ -362,6 +362,10 @@ body {
 }
 
 /* 切割测算 */
+#cut-target-n.edited {
+  color: #f08c00;
+}
+
 .cut-summary {
   margin-bottom: 14px;
 }

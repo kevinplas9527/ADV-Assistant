@@ -5,6 +5,9 @@ Page({
     blockL: "",
     blockW: "",
     kerf: "",
+    targetN: "",
+    targetNEdited: false,
+    cutMsg: "",
     showResult: false,
     count: 0,
     mode: "",
@@ -29,9 +32,19 @@ Page({
     this.setData({ [field]: e.detail.value });
   },
 
+  onTargetNInput(e) {
+    this.setData({ targetN: e.detail.value, targetNEdited: true, cutMsg: "" });
+  },
+
   num(v) {
     const n = parseFloat(v);
     return isFinite(n) && n > 0 ? n : null;
+  },
+
+  formatNum(n) {
+    if (!isFinite(n)) return "-";
+    const rounded = Math.round(n * 1000) / 1000;
+    return rounded.toLocaleString("zh-CN", { maximumFractionDigits: 3 });
   },
 
   // 沿一个方向排 n 块：n×块 + (n-1)×刀缝 ≤ 板长
@@ -159,6 +172,52 @@ Page({
     return best;
   },
 
+  // 反算板材长/宽：已知一个方向尺寸，按直排求另一方向最小长度
+  minLength(fixedLen, N, bw, bh, kerf) {
+    let bestLen = null;
+    // 方案A：固定方向排 bh 高（正向块）
+    const rows = this.cutNum(fixedLen, bh, kerf);
+    if (rows > 0) {
+      const cols = Math.ceil(N / rows);
+      const len = cols * bw + (cols - 1) * kerf;
+      if (bestLen === null || len < bestLen) bestLen = len;
+    }
+    // 方案B：固定方向排 bw 高（旋转块）
+    const rows2 = this.cutNum(fixedLen, bw, kerf);
+    if (rows2 > 0) {
+      const cols2 = Math.ceil(N / rows2);
+      const len2 = cols2 * bh + (cols2 - 1) * kerf;
+      if (bestLen === null || len2 < bestLen) bestLen = len2;
+    }
+    return bestLen;
+  },
+
+  // 常规测算：排样 + 展示结果与示意图
+  runCut(W, H, bw, bh, kerf, msg, keepMsg) {
+    if ((bw > W && bh > W) && (bw > H && bh > H)) {
+      wx.showToast({ title: "块尺寸大于板材，无法切割", icon: "none" });
+      return;
+    }
+    const best = this.bestCut(W, H, bw, bh, kerf);
+    if (best.count === 0) {
+      wx.showToast({ title: "无法放下任何一块", icon: "none" });
+      return;
+    }
+    const ratio = ((best.count * bw * bh) / (W * H) * 100).toFixed(1);
+    const waste = W * H - best.count * bw * bh;
+    this.setData({
+      showResult: true,
+      count: best.count,
+      mode: best.mode,
+      ratio: ratio,
+      waste: waste.toLocaleString("zh-CN"),
+      canvasHeight: 0,
+      cutMsg: msg || (keepMsg ? this.data.cutMsg : "")
+    });
+    // 等 canvas 渲染后绘制
+    setTimeout(() => this.drawCut(best.blocks, W, H), 80);
+  },
+
   onCut() {
     const d = this.data;
     const W = this.num(d.plateL);
@@ -167,35 +226,51 @@ Page({
     const bh = this.num(d.blockW);
     let kerf = parseFloat(d.kerf);
     if (!isFinite(kerf) || kerf < 0) kerf = 0;
+    const targetN = parseInt(d.targetN, 10);
+    const hasTarget = isFinite(targetN) && targetN > 0;
 
-    if (W === null || H === null || bw === null || bh === null) {
-      wx.showToast({ title: "请完整填写板材、块和刀缝", icon: "none" });
-      return;
-    }
-    if ((bw > W && bh > W) && (bw > H && bh > H)) {
-      wx.showToast({ title: "块尺寸大于板材，无法切割", icon: "none" });
-      return;
-    }
-
-    const best = this.bestCut(W, H, bw, bh, kerf);
-    if (best.count === 0) {
-      wx.showToast({ title: "无法放下任何一块", icon: "none" });
+    if (bw === null || bh === null) {
+      wx.showToast({ title: "请填写块长和块宽（mm）", icon: "none" });
       return;
     }
 
-    const ratio = ((best.count * bw * bh) / (W * H) * 100).toFixed(1);
-    const waste = W * H - best.count * bw * bh;
+    const missing = (W === null ? 1 : 0) + (H === null ? 1 : 0);
 
-    this.setData({
-      showResult: true,
-      count: best.count,
-      mode: best.mode,
-      ratio: ratio,
-      waste: waste.toLocaleString("zh-CN"),
-      canvasHeight: 0
-    });
-    // 等 canvas 渲染后绘制
-    setTimeout(() => this.drawCut(best.blocks, W, H), 80);
+    if (missing === 0) {
+      if (hasTarget) {
+        this.runCut(W, H, bw, bh, kerf, "目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸", false);
+      } else {
+        this.setData({ targetNEdited: false });
+        this.runCut(W, H, bw, bh, kerf, "", false);
+      }
+      return;
+    }
+
+    if (missing === 1 && hasTarget) {
+      const fixed = W === null ? H : W;
+      const need = this.minLength(fixed, targetN, bw, bh, kerf);
+      if (need === null) {
+        wx.showToast({ title: "固定方向的板材尺寸不足以排下任意一块", icon: "none" });
+        return;
+      }
+      const missName = W === null ? "板材长" : "板材宽";
+      const missField = W === null ? "plateL" : "plateW";
+      const patch = {};
+      patch[missField] = String(Math.round(need * 1000) / 1000);
+      patch.cutMsg = "✓ 反算" + missName + " = " + this.formatNum(need) + " mm（按目标 " + targetN + " 块，最小需）";
+      this.setData(patch);
+      const newW = W === null ? need : W;
+      const newH = H === null ? need : H;
+      this.runCut(newW, newH, bw, bh, kerf, "", true);
+      return;
+    }
+
+    if (missing > 1) {
+      wx.showToast({ title: "反算时只能留空板材长或板材宽之一", icon: "none" });
+      return;
+    }
+
+    wx.showToast({ title: "请输入目标块数后再反算", icon: "none" });
   },
 
   drawCut(blocks, W, H) {
