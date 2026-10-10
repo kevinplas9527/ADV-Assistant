@@ -160,7 +160,6 @@
 
   <view class="app-footer">
     <view class="slogan">advanced plastics for better life</view>
-    <view class="footer-note">ADV小助手 · 密度为常用参考值，请按实际牌号核对</view>
     <view class="footer-note">本工具测算结果仅供参考，不构成交货承诺；实际密度、损耗与加工以实测确认为准</view>
   </view>
 </view>

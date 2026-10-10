@@ -352,7 +352,7 @@ input,
 .footer-note {
   font-size: 24rpx;
   color: #6b7686;
-  margin-top: 24rpx;
+  margin-top: 20rpx;
 }
 
 /* 输入引导占位文字（更醒目） */
