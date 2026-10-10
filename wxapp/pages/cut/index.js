@@ -15,12 +15,58 @@ Page({
     mode: "",
     ratio: "",
     waste: "",
-    canvasHeight: 0
+    canvasHeight: 0,
+
+    // 切割类型与棒/管
+    cutType: "plate", // plate | rod
+    rodShape: "rod", // rod | tube
+    rodLen: "",
+    rodDia: "",
+    rodPiece: "",
+    rodClamp: "",
+    rodKerf: "",
+    rodTargetN: "",
+    rodTargetNEdited: false,
+    rodMsg: "",
+    rodMsgWarn: false,
+    rodTargetShow: "",
+    showRodResult: false,
+    rodCount: 0,
+    rodShapeName: "棒材",
+    rodUsed: "",
+    rodTail: "",
+    rodRatio: "",
+    rodKerfCount: 0,
+    rodCanvasHeight: 0
   },
 
   onReady() {
     // 注意：canvas 在 wx:if 内，首次进入尚未渲染，此处仅做预初始化（拿不到节点也正常）
     this.initCanvas();
+  },
+
+  // 切割类型切换
+  onCutTypeTap(e) {
+    this.setData({ cutType: e.currentTarget.dataset.type });
+  },
+
+  // 棒/管形态切换
+  onRodShapeTap(e) {
+    this.setData({ rodShape: e.currentTarget.dataset.shape });
+  },
+
+  onRodInput(e) {
+    const field = e.currentTarget.dataset.field;
+    this.setData({ [field]: e.detail.value });
+  },
+
+  onRodTargetNInput(e) {
+    this.setData({ rodTargetN: e.detail.value, rodTargetNEdited: true, rodMsg: "", rodMsgWarn: false });
+  },
+
+  rodNum(v) {
+    const n = parseFloat(v);
+    return isFinite(n) && n > 0 ? n : null;
   },
 
   // 查询并缓存 canvas 节点（画布渲染后才可查询）
@@ -303,6 +349,184 @@ Page({
     }
 
     wx.showToast({ title: "请输入目标块数后再反算", icon: "none" });
+  },
+
+  // ---------- 棒/管切割 ----------
+  rodRun(L, p, clamp, k, n, msg, keepMsg, targetText) {
+    if (n < 1) {
+      wx.showToast({ title: "材料长度不足以切出 1 件（含夹持）", icon: "none" });
+      return;
+    }
+    const used = clamp + n * p + (n - 1) * k;
+    const tail = Math.max(0, L - used);
+    const ratio = ((n * p) / L * 100).toFixed(1);
+    this.setData({
+      showRodResult: true,
+      rodCount: n,
+      rodShapeName: this.data.rodShape === "tube" ? "管材" : "棒材",
+      rodLen: L,
+      rodPiece: p,
+      rodClamp: clamp,
+      rodKerf: k,
+      rodUsed: this.formatNum(used),
+      rodTail: this.formatNum(tail),
+      rodRatio: ratio,
+      rodKerfCount: n - 1,
+      rodCanvasHeight: 0,
+      rodMsg: msg || (keepMsg ? this.data.rodMsg : ""),
+      rodMsgWarn: !!msg && msg.indexOf("目标件数用于反算") !== -1,
+      rodTargetShow: targetText || ""
+    });
+    setTimeout(() => this.initRodCanvasAndDraw(n, L, p, clamp, k), 120);
+  },
+
+  initRodCanvasAndDraw(n, L, p, clamp, k) {
+    const query = wx.createSelectorQuery().in(this);
+    query.select("#rodCanvas").fields({ node: true, size: true }).exec((res) => {
+      if (res && res[0] && res[0].node) {
+        this.rodCanvas = res[0].node;
+        this.rodCtx = this.rodCanvas.getContext("2d");
+        this.rodCanvasCssWidth = res[0].width;
+        this.drawRod(n, L, p, clamp, k);
+      } else {
+        this._rodRetry = (this._rodRetry || 0) + 1;
+        if (this._rodRetry <= 3) {
+          setTimeout(() => this.initRodCanvasAndDraw(n, L, p, clamp, k), 120);
+        }
+      }
+    });
+  },
+
+  // 一维切割示意图：夹持段(灰) + 各件(蓝) + 刀缝(细分隔) + 余料(白)
+  drawRod(n, L, p, clamp, k) {
+    if (!this.rodCanvas || !this.rodCtx) {
+      this.initRodCanvasAndDraw(n, L, p, clamp, k);
+      return;
+    }
+    const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const dpr = info.pixelRatio || 2;
+    const cssW = this.rodCanvasCssWidth || 320;
+    const cssH = 80;
+    const pw = Math.round(cssW * dpr);
+    const ph = Math.round(cssH * dpr);
+    this.rodCanvas.width = pw;
+    this.rodCanvas.height = ph;
+    this.setData({ rodCanvasHeight: cssH });
+
+    const ctx = this.rodCtx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, pw, ph);
+    ctx.scale(dpr, dpr);
+
+    const used = clamp + n * p + (n - 1) * k;
+    const tail = Math.max(0, L - used);
+    const scale = (cssW - 16) / L;
+    let x = 8;
+    const y = 26;
+    const h = 30;
+
+    const seg = (w, color, border) => {
+      const ww = Math.max(w * scale, w > 0 ? 1 : 0);
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, ww, h);
+      if (border) {
+        ctx.strokeStyle = border;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, ww, h);
+      }
+      x += ww;
+    };
+
+    if (clamp > 0) seg(clamp, "#b8bec9", "#8a93a3");
+    for (let i = 0; i < n; i++) {
+      seg(p, "#1e5eff");
+      if (i < n - 1) {
+        const kw = Math.max(k * scale, 1);
+        ctx.fillStyle = "#e9edf4";
+        ctx.fillRect(x, y, kw, h);
+        x += kw;
+      }
+    }
+    if (tail > 0) seg(tail, "#ffffff", "#c3cad6");
+
+    ctx.fillStyle = "#6b7686";
+    ctx.font = "11px sans-serif";
+    ctx.fillText("夹持 " + this.formatNum(clamp), 8, 20);
+    if (tail > 0.5) {
+      const tx = 8 + (clamp + n * p + (n - 1) * k) * scale;
+      ctx.fillText("余料 " + this.formatNum(tail), Math.min(tx, cssW - 70), cssH - 8);
+    }
+  },
+
+  onRodCut() {
+    const d = this.data;
+    const L = this.rodNum(d.rodLen);
+    const p = this.rodNum(d.rodPiece);
+    let k = parseFloat(d.rodKerf);
+    if (!isFinite(k) || k < 0) k = 0;
+    let clamp = d.rodClamp === "" ? 20 : parseFloat(d.rodClamp);
+    if (!isFinite(clamp) || clamp < 0) clamp = 20;
+    const targetN = parseInt(d.rodTargetN, 10);
+    const hasTarget = isFinite(targetN) && targetN > 0;
+
+    if (p === null && L === null) {
+      wx.showToast({ title: "请填写材料长度和单件长度（mm）", icon: "none" });
+      return;
+    }
+
+    const missing = (L === null ? 1 : 0) + (p === null ? 1 : 0);
+
+    if (missing === 0) {
+      if (hasTarget && d.rodTargetNEdited) {
+        this.rodRun(L, p, clamp, k, 0, "⚠ 目标件数用于反算：清空材料长度或单件长度后点测算，可反算对应尺寸", false);
+        this.setData({ showRodResult: true });
+        return;
+      }
+      this.setData({ rodTargetNEdited: false });
+      if (L < clamp + p) {
+        wx.showToast({ title: "材料长度不足以切出 1 件（需 ≥ " + this.formatNum(clamp + p) + " mm）", icon: "none" });
+        return;
+      }
+      const n = Math.floor((L - clamp + k) / (p + k));
+      this.rodRun(L, p, clamp, k, n, d.rodClamp === "" ? "夹持按推荐值 20 mm 计" : "", false);
+      return;
+    }
+
+    if (missing === 1 && hasTarget) {
+      let need;
+      let missName;
+      const patch = {};
+      if (L === null) {
+        need = clamp + targetN * p + (targetN - 1) * k;
+        missName = "材料长度";
+        patch.rodLen = String(Math.round(need * 1000) / 1000);
+      } else {
+        const remain = L - clamp - (targetN - 1) * k;
+        if (remain <= 0) {
+          wx.showToast({ title: "材料长度不足，无法满足目标件数", icon: "none" });
+          return;
+        }
+        need = remain / targetN;
+        missName = "单件长度";
+        patch.rodPiece = String(Math.round(need * 1000) / 1000);
+      }
+      patch.rodMsg = "✓ 反算" + missName + " = " + this.formatNum(need) + " mm（按目标 " + targetN + " 件，最小需）";
+      patch.rodMsgWarn = false;
+      this.setData(patch);
+      const newL = L === null ? need : L;
+      const newP = p === null ? need : p;
+      // 反算成功后：清空目标件数、复位颜色，结果区显示目标
+      this.setData({ rodTargetN: "", rodTargetNEdited: false });
+      this.rodRun(newL, newP, clamp, k, targetN, "", true, "（目标 " + targetN + " 件）");
+      return;
+    }
+
+    if (missing > 1) {
+      wx.showToast({ title: "反算时只能留空材料长度或单件长度之一", icon: "none" });
+      return;
+    }
+
+    wx.showToast({ title: "请输入目标件数后再反算", icon: "none" });
   },
 
   drawCut(blocks, W, H) {

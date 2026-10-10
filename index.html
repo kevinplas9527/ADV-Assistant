@@ -192,43 +192,92 @@
       <section id="page-cut" class="hidden">
         <section class="card">
           <h2>① 切割参数</h2>
-          <div class="form-grid two">
-            <div class="field">
-              <label for="cut-plate-l">板材长（mm）</label>
-              <input type="number" id="cut-plate-l" placeholder="如 1000" min="0">
-            </div>
-            <div class="field">
-              <label for="cut-plate-w">板材宽（mm）</label>
-              <input type="number" id="cut-plate-w" placeholder="如 1200" min="0">
-            </div>
+          <div class="shape-tabs cut-type-tabs">
+            <button class="shape-btn active" data-cuttype="plate" id="cuttype-plate">板材切割</button>
+            <button class="shape-btn" data-cuttype="rod" id="cuttype-rod">棒/管切割</button>
           </div>
-          <div class="form-grid two">
-            <div class="field">
-              <label for="cut-block-l">块长（mm）</label>
-              <input type="number" id="cut-block-l" placeholder="如 90" min="0">
+          <div id="cut-panel-plate">
+            <div class="form-grid two">
+              <div class="field">
+                <label for="cut-plate-l">板材长（mm）</label>
+                <input type="number" id="cut-plate-l" placeholder="如 1000" min="0">
+              </div>
+              <div class="field">
+                <label for="cut-plate-w">板材宽（mm）</label>
+                <input type="number" id="cut-plate-w" placeholder="如 1200" min="0">
+              </div>
             </div>
-            <div class="field">
-              <label for="cut-block-w">块宽（mm）</label>
-              <input type="number" id="cut-block-w" placeholder="如 100" min="0">
+            <div class="form-grid two">
+              <div class="field">
+                <label for="cut-block-l">块长（mm）</label>
+                <input type="number" id="cut-block-l" placeholder="如 90" min="0">
+              </div>
+              <div class="field">
+                <label for="cut-block-w">块宽（mm）</label>
+                <input type="number" id="cut-block-w" placeholder="如 100" min="0">
+              </div>
             </div>
+            <div class="form-grid two">
+              <div class="field">
+                <label for="cut-kerf">刀缝（mm）</label>
+                <input type="number" id="cut-kerf" placeholder="如 5" min="0">
+              </div>
+              <div class="field">
+                <label for="cut-target-n">目标块数（反算用）</label>
+                <input type="number" id="cut-target-n" placeholder="留空按常规测算" min="0">
+              </div>
+            </div>
+            <button id="cut-btn" class="calc-btn">测算</button>
           </div>
-          <div class="form-grid two">
-            <div class="field">
-              <label for="cut-kerf">刀缝（mm）</label>
-              <input type="number" id="cut-kerf" placeholder="如 5" min="0">
+          <div id="cut-panel-rod" class="hidden">
+            <div class="shape-tabs rod-shape-tabs">
+              <button class="shape-btn active" data-rods="rod" id="rods-rod">棒材</button>
+              <button class="shape-btn" data-rods="tube" id="rods-tube">管材</button>
             </div>
-            <div class="field">
-              <label for="cut-target-n">目标块数（反算用）</label>
-              <input type="number" id="cut-target-n" placeholder="留空按常规测算" min="0">
+            <div class="form-grid two">
+              <div class="field">
+                <label for="rod-len">材料长度（mm）</label>
+                <input type="number" id="rod-len" placeholder="如 1000" min="0">
+              </div>
+              <div class="field">
+                <label for="rod-dia">直径（mm）</label>
+                <input type="number" id="rod-dia" placeholder="如 50" min="0">
+              </div>
             </div>
+            <div class="form-grid two">
+              <div class="field">
+                <label for="rod-piece">单件长度（mm）</label>
+                <input type="number" id="rod-piece" placeholder="如 40" min="0">
+              </div>
+              <div class="field">
+                <label for="rod-clamp">夹持长度（mm）</label>
+                <input type="number" id="rod-clamp" placeholder="推荐 20" min="0">
+              </div>
+            </div>
+            <div class="form-grid two">
+              <div class="field">
+                <label for="rod-kerf">刀缝（mm）</label>
+                <input type="number" id="rod-kerf" placeholder="如 3" min="0">
+              </div>
+              <div class="field">
+                <label for="rod-target-n">目标件数（反算用）</label>
+                <input type="number" id="rod-target-n" placeholder="留空按常规测算" min="0">
+              </div>
+            </div>
+            <button id="rod-btn" class="calc-btn">测算</button>
           </div>
-          <button id="cut-btn" class="calc-btn">测算</button>
         </section>
         <section class="card cut-result-card hidden" id="cut-result-card">
           <h2>② 测算结果</h2>
           <div class="solve-msg hidden" id="cut-msg"></div>
           <div class="cut-summary" id="cut-summary"></div>
           <canvas id="cut-canvas" class="cut-canvas"></canvas>
+        </section>
+        <section class="card cut-result-card hidden" id="rod-result-card">
+          <h2>② 测算结果</h2>
+          <div class="solve-msg hidden" id="rod-msg"></div>
+          <div class="cut-summary" id="rod-summary"></div>
+          <canvas id="rod-canvas" class="cut-canvas"></canvas>
         </section>
       </section>
     </main>

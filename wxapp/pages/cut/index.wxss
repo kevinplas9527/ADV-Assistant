@@ -92,6 +92,36 @@
   opacity: 0.85;
 }
 
+/* 切割类型切换 / 棒管形态切换 */
+.cut-type-tabs,
+.rod-shape-tabs {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.rod-shape-tabs {
+  margin-bottom: 20rpx;
+}
+
+.cut-type-btn {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border: 1rpx solid #dce4f0;
+  border-radius: 12rpx;
+  background: #fff;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1e5eff;
+}
+
+.cut-type-btn.active {
+  background: #eef3ff;
+  border-color: #1e5eff;
+  color: #1e5eff;
+}
+
 /* 反算目标块数（橙色） */
 .field input.edited {
   color: #f08c00;
@@ -174,6 +204,17 @@
 
 .legend-rot {
   border: 3rpx dashed #f08c00;
+}
+
+.legend-clamp {
+  background: #b8bec9;
+}
+
+.legend-line {
+  width: 26rpx;
+  height: 36rpx;
+  border-right: 3rpx solid #d8dee9;
+  box-sizing: border-box;
 }
 
 /* 画布 */

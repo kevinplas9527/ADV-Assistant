@@ -652,4 +652,211 @@
 
     alert("请输入目标块数后再反算（修改目标块数并留空板材长或板材宽）");
   });
+
+  // ---------- 棒/管切割 ----------
+  var rodMsg = document.getElementById("rod-msg");
+  var rodTargetN = document.getElementById("rod-target-n");
+  var rodPanelPlate = document.getElementById("cut-panel-plate");
+  var rodPanelRod = document.getElementById("cut-panel-rod");
+  var cutResultCard = document.getElementById("cut-result-card");
+  var rodResultCard = document.getElementById("rod-result-card");
+  var rodShape = "rod"; // rod | tube
+  var ROD_RECOMMEND_CLAMP = 20; // 工程塑料常用夹持推荐值（mm）
+
+  // 切割类型切换：板材 / 棒管
+  document.querySelectorAll("[data-cuttype]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("[data-cuttype]").forEach(function (b) {
+        b.classList.toggle("active", b === btn);
+      });
+      var isPlate = btn.getAttribute("data-cuttype") === "plate";
+      rodPanelPlate.classList.toggle("hidden", !isPlate);
+      rodPanelRod.classList.toggle("hidden", isPlate);
+      cutResultCard.classList.toggle("hidden", !isPlate);
+      rodResultCard.classList.toggle("hidden", isPlate);
+    });
+  });
+
+  // 棒/管形态切换
+  document.querySelectorAll("[data-rods]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll("[data-rods]").forEach(function (b) {
+        b.classList.toggle("active", b === btn);
+      });
+      rodShape = btn.getAttribute("data-rods");
+      document.getElementById("rod-result-card").querySelector("h2").textContent = "② 测算结果";
+    });
+  });
+
+  // 目标件数修改 → 橙色标记
+  rodTargetN.addEventListener("input", function () {
+    if (rodTargetN.value !== "") {
+      rodTargetN.classList.add("edited");
+    } else {
+      rodTargetN.classList.remove("edited");
+    }
+  });
+
+  function rodDrawCanvas(n, L, p, clamp, k) {
+    var canvas = document.getElementById("rod-canvas");
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = canvas.clientWidth || 320;
+    var cssH = 64;
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+    var used = clamp + n * p + (n - 1) * k;
+    var tail = Math.max(0, L - used);
+    var scale = (cssW - 16) / L;
+    var x = 8;
+    var y = 18;
+    var h = 28;
+    function seg(w, color, border) {
+      var ww = Math.max(w * scale, w > 0 ? 1 : 0);
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, ww, h);
+      if (border) {
+        ctx.strokeStyle = border;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, ww, h);
+      }
+      x += ww;
+    }
+    // 夹持段（灰）
+    if (clamp > 0) {
+      seg(clamp, "#b8bec9", "#8a93a3");
+    }
+    // 各件（蓝）+ 刀缝（白细分隔）
+    for (var i = 0; i < n; i++) {
+      seg(p, "#1e5eff");
+      if (i < n - 1) {
+        var kw = Math.max(k * scale, 1);
+        ctx.fillStyle = "#e9edf4";
+        ctx.fillRect(x, y, kw, h);
+        x += kw;
+      }
+    }
+    // 余料（白底浅框）
+    if (tail > 0) {
+      seg(tail, "#ffffff", "#c3cad6");
+    }
+    // 标注
+    ctx.fillStyle = "#6b7686";
+    ctx.font = "11px sans-serif";
+    ctx.fillText("夹持 " + formatNum(clamp), 8, 12);
+    if (tail > 0.5) {
+      var tx = 8 + (clamp + n * p + (n - 1) * k) * scale;
+      ctx.fillText("余料 " + formatNum(tail), tx, cssH - 6);
+    }
+  }
+
+  function rodRun(L, p, clamp, k, n, msg, keepMsg, targetText) {
+    if (n < 1) {
+      alert("材料长度不足以切出 1 件（含夹持），请检查尺寸");
+      return;
+    }
+    var used = clamp + n * p + (n - 1) * k;
+    var tail = Math.max(0, L - used);
+    var ratio = ((n * p) / L) * 100;
+    var rodShapeName = rodShape === "tube" ? "管材" : "棒材";
+    document.getElementById("rod-summary").innerHTML =
+      "<div class='cut-count'>可切 <b>" + n + "</b> 件" +
+      (targetText ? " <span class='cut-target'>" + targetText + "</span>" : "") + "</div>" +
+      "<div class='cut-meta'>" + rodShapeName + " " + L + " mm ｜ 单件 " + p + " mm ｜ 夹持 " + formatNum(clamp) + " mm ｜ 刀缝 " + k + " mm</div>" +
+      "<div class='cut-meta'>占用 " + formatNum(used) + " mm（夹持 " + formatNum(clamp) + " + " + n + "×" + p + " + " + (n - 1) + "×" + k + "）｜ 余料 " + formatNum(tail) + " mm</div>" +
+      "<div class='cut-meta'>材料利用率 " + ratio.toFixed(1) + "%</div>";
+    rodResultCard.classList.remove("hidden");
+    if (msg) {
+      rodMsg.classList.remove("hidden");
+      rodMsg.textContent = msg;
+      if (msg.indexOf("目标件数用于反算") !== -1) {
+        rodMsg.classList.add("warn");
+      } else {
+        rodMsg.classList.remove("warn");
+      }
+    } else if (!keepMsg) {
+      rodMsg.classList.add("hidden");
+    }
+    rodDrawCanvas(n, L, p, clamp, k);
+  }
+
+  function rodCalc() {
+    var L = num("rod-len");
+    var p = num("rod-piece");
+    var k = parseFloat(document.getElementById("rod-kerf").value);
+    if (!isFinite(k) || k < 0) k = 0;
+    var clampRaw = document.getElementById("rod-clamp").value;
+    var clamp = clampRaw === "" ? ROD_RECOMMEND_CLAMP : parseFloat(clampRaw);
+    if (!isFinite(clamp) || clamp < 0) clamp = ROD_RECOMMEND_CLAMP;
+    var dia = document.getElementById("rod-dia").value;
+    var targetN = parseInt(rodTargetN.value, 10);
+    var hasTarget = isFinite(targetN) && targetN > 0;
+
+    if (p === null && L === null) {
+      alert("请填写材料长度和单件长度（mm）");
+      return;
+    }
+
+    var missing = (L === null ? 1 : 0) + (p === null ? 1 : 0);
+
+    // 常规测算
+    if (missing === 0) {
+      if (hasTarget && rodTargetN.classList.contains("edited")) {
+        rodRun(L, p, clamp, k, 0, "⚠ 目标件数用于反算：清空材料长度或单件长度后点测算，可反算对应尺寸", false);
+        rodResultCard.classList.remove("hidden");
+        return;
+      }
+      rodTargetN.classList.remove("edited");
+      if (L < clamp + p) {
+        alert("材料长度不足以切出 1 件（需 ≥ " + formatNum(clamp + p) + " mm，含夹持）");
+        return;
+      }
+      var n = Math.floor((L - clamp + k) / (p + k));
+      rodRun(L, p, clamp, k, n, clampRaw === "" ? "夹持按推荐值 20 mm 计" : "", false);
+      return;
+    }
+
+    // 反算
+    if (missing === 1 && hasTarget) {
+      var need;
+      var missName;
+      if (L === null) {
+        // 反算材料长度
+        need = clamp + targetN * p + (targetN - 1) * k;
+        missName = "材料长度";
+        document.getElementById("rod-len").value = String(Math.round(need * 1000) / 1000);
+      } else {
+        // 反算单件长度
+        var remain = L - clamp - (targetN - 1) * k;
+        if (remain <= 0) {
+          alert("材料长度不足，无法满足目标件数");
+          return;
+        }
+        need = remain / targetN;
+        missName = "单件长度";
+        document.getElementById("rod-piece").value = String(Math.round(need * 1000) / 1000);
+      }
+      rodMsg.classList.remove("hidden");
+      rodMsg.classList.remove("warn");
+      rodMsg.textContent = "✓ 反算" + missName + " = " + formatNum(need) + " mm（按目标 " + targetN + " 件，最小需）";
+      var newL = L === null ? need : L;
+      var newP = p === null ? need : p;
+      // 反算成功后：清空目标件数、复位颜色，结果区显示目标
+      rodTargetN.value = "";
+      rodTargetN.classList.remove("edited");
+      rodRun(newL, newP, clamp, k, targetN, "", true, "（目标 " + targetN + " 件）");
+      return;
+    }
+
+    if (missing > 1) {
+      alert("反算时只能留空材料长度或单件长度之一");
+      return;
+    }
+
+    alert("请输入目标件数后再反算（修改目标件数并留空材料长度或单件长度）");
+  }
+
+  document.getElementById("rod-btn").addEventListener("click", rodCalc);
 })();
