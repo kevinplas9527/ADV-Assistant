@@ -595,14 +595,39 @@
     drawCutCanvas(best.blocks, W, H);
   }
 
+  // 刀缝按厚度推荐（工程塑料锯切常用）
+  function kerfByThickness(t) {
+    if (t <= 5) return 2;
+    if (t <= 10) return 3;
+    if (t <= 20) return 4;
+    if (t <= 30) return 5;
+    return 6;
+  }
+
+  // 厚度变化 → 联动刀缝推荐值（灰色 placeholder）
+  var cutThickness = document.getElementById("cut-thickness");
+  var cutKerf = document.getElementById("cut-kerf");
+  cutThickness.addEventListener("input", function () {
+    var t = num("cut-thickness");
+    cutKerf.placeholder = t !== null ? "推荐 " + kerfByThickness(t) + "（厚度 " + t + " mm）" : "如 5";
+  });
+
   cutBtn.addEventListener("click", function () {
     var W = num("cut-plate-l");
     var H = num("cut-plate-w");
     var bw = num("cut-block-l");
     var bh = num("cut-block-w");
-    var kerf = parseFloat(document.getElementById("cut-kerf").value);
+    var thickness = num("cut-thickness");
+    var kerfRaw = document.getElementById("cut-kerf").value;
+    var kerf = parseFloat(kerfRaw);
     if (!isFinite(kerf)) kerf = 0;
     if (kerf < 0) kerf = 0;
+    // 刀缝留空：按厚度推荐（未填厚度按默认 4mm）
+    var kerfHint = "";
+    if (kerfRaw === "") {
+      kerf = thickness !== null ? kerfByThickness(thickness) : 4;
+      kerfHint = "刀缝按推荐值 " + kerf + " mm 计" + (thickness !== null ? "（厚度 " + thickness + " mm）" : "（未填厚度）");
+    }
     var targetN = parseInt(document.getElementById("cut-target-n").value, 10);
     var hasTarget = isFinite(targetN) && targetN > 0;
 
@@ -618,7 +643,7 @@
         runCut(W, H, bw, bh, kerf, "⚠ 目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸");
       } else {
         cutTargetN.classList.remove("edited");
-        runCut(W, H, bw, bh, kerf, "");
+        runCut(W, H, bw, bh, kerf, kerfHint);
       }
       return;
     }

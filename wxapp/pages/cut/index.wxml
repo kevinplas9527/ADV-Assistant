@@ -38,10 +38,16 @@
       </view>
       <view class="form-grid two">
         <view class="field">
-          <view class="label">刀缝（mm）</view>
-          <input type="digit" value="{{kerf}}" data-field="kerf" bindinput="onInput" placeholder="如 5" />
+          <view class="label">板材厚度（mm）</view>
+          <input type="digit" value="{{cutThickness}}" data-field="cutThickness" bindinput="onCutThicknessInput" placeholder="如 20" />
         </view>
         <view class="field">
+          <view class="label">刀缝（mm）</view>
+          <input type="digit" value="{{kerf}}" data-field="kerf" bindinput="onInput" placeholder="{{kerfPlaceholder}}" />
+        </view>
+      </view>
+      <view class="form-grid">
+        <view class="field" style="flex: 1">
           <view class="label">目标块数（反算用）</view>
           <input class="{{targetNEdited ? 'edited' : ''}}" type="number" value="{{targetN}}" data-field="targetN" bindinput="onTargetNInput" placeholder="留空按常规测算" />
         </view>

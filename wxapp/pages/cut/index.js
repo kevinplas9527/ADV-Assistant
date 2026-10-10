@@ -2,6 +2,9 @@ Page({
   data: {
     plateL: "",
     plateW: "",
+    cutThickness: "",
+    kerf: "",
+    kerfPlaceholder: "如 5",
     blockL: "",
     blockW: "",
     kerf: "",
@@ -77,6 +80,24 @@ Page({
   onInput(e) {
     const field = e.currentTarget.dataset.field;
     this.setData({ [field]: e.detail.value });
+  },
+
+  // 板材厚度变化 → 联动刀缝推荐值（灰色 placeholder）
+  onCutThicknessInput(e) {
+    const t = this.num(e.detail.value);
+    this.setData({
+      cutThickness: e.detail.value,
+      kerfPlaceholder: t !== null ? "推荐 " + this.kerfByThickness(t) + "（厚度 " + t + " mm）" : "如 5"
+    });
+  },
+
+  // 刀缝按厚度推荐（工程塑料锯切常用）
+  kerfByThickness(t) {
+    if (t <= 5) return 2;
+    if (t <= 10) return 3;
+    if (t <= 20) return 4;
+    if (t <= 30) return 5;
+    return 6;
   },
 
   onTargetNInput(e) {
@@ -292,7 +313,14 @@ Page({
     const H = this.num(d.plateW);
     const bw = this.num(d.blockL);
     const bh = this.num(d.blockW);
+    const thickness = this.num(d.cutThickness);
+    // 刀缝留空：按厚度推荐（未填厚度按默认 4mm）
     let kerf = parseFloat(d.kerf);
+    let kerfHint = "";
+    if (d.kerf === "") {
+      kerf = thickness !== null ? this.kerfByThickness(thickness) : 4;
+      kerfHint = "刀缝按推荐值 " + kerf + " mm 计" + (thickness !== null ? "（厚度 " + thickness + " mm）" : "（未填厚度）");
+    }
     if (!isFinite(kerf) || kerf < 0) kerf = 0;
     const targetN = parseInt(d.targetN, 10);
     const hasTarget = isFinite(targetN) && targetN > 0;
@@ -309,7 +337,7 @@ Page({
         this.runCut(W, H, bw, bh, kerf, "⚠ 目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸", false);
       } else {
         this.setData({ targetNEdited: false });
-        this.runCut(W, H, bw, bh, kerf, "", false);
+        this.runCut(W, H, bw, bh, kerf, kerfHint, false);
       }
       return;
     }
