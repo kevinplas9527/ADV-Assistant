@@ -35,39 +35,36 @@
   margin-top: 2rpx;
 }
 
-/* 功能入口 */
-.entry-banner {
+/* 功能页签 */
+.tabbar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #1e5eff, #4d82ff);
-  border-radius: 16rpx;
-  padding: 20rpx 26rpx;
+  border-bottom: 2rpx solid #eef1f6;
   margin-bottom: 20rpx;
-  box-shadow: 0 4rpx 14rpx rgba(30, 94, 255, 0.22);
 }
 
-.entry-banner:active {
-  opacity: 0.9;
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 14rpx 0 12rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #9aa7bc;
+  position: relative;
 }
 
-.entry-title {
-  color: #fff;
-  font-size: 26rpx;
-  font-weight: 700;
+.tab.on {
+  color: #1e5eff;
 }
 
-.entry-sub {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 20rpx;
-  margin-top: 4rpx;
-}
-
-.entry-arrow {
-  color: #fff;
-  font-size: 34rpx;
-  font-weight: 300;
-  line-height: 1;
+.tab.on::after {
+  content: "";
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  bottom: 0;
+  height: 4rpx;
+  border-radius: 2rpx;
+  background: #1e5eff;
 }
 
 /* 卡片 */

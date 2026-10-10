@@ -20,6 +20,7 @@ const MATERIALS = [
 
 Page({
   data: {
+    activeTab: "weight",
     materials: MATERIALS,
     materialIndex: 0,
     materialName: "PTFE 聚四氟乙烯",
@@ -342,8 +343,13 @@ Page({
     });
   },
 
-  // 跳转板棒材切割测算
-  onGoCut() {
-    wx.navigateTo({ url: "/pages/cut/index" });
+  // 页签切换：切割页签跳转板棒材切割测算
+  onTabTap(e) {
+    const t = e.currentTarget.dataset.tab;
+    if (t === "cut") {
+      wx.navigateTo({ url: "/pages/cut/index" });
+    } else {
+      this.setData({ activeTab: "weight" });
+    }
   }
 });
