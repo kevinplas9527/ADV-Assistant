@@ -94,34 +94,68 @@ Page({
     };
   },
 
-  // 语音输入：点击开始/停止
+  // 语音输入：点击开始/停止（全链路异常兜底，任何问题都会可见提示）
   onVoiceTap() {
     if (!this.voiceManager) {
-      wx.showToast({ title: "语音插件未就绪，请先在公众平台添加「同声传译」插件", icon: "none", duration: 2500 });
+      wx.showToast({ title: "语音插件未就绪，请检查插件是否添加", icon: "none", duration: 2500 });
       return;
     }
-    if (this.data.voiceState === "rec") {
-      this.voiceManager.stop();
-      return;
-    }
-    const startRec = () => {
-      this.voiceManager.start({ duration: 30000, lang: "zh_CN" });
-    };
-    wx.getSetting({
-      success: (r) => {
-        if (!r.authSetting["scope.record"]) {
+    try {
+      if (this.data.voiceState === "rec") {
+        this.voiceManager.stop();
+        return;
+      }
+      const startRec = () => {
+        try {
+          this.voiceManager.start({ duration: 30000, lang: "zh_CN" });
+          // 立即给出录音态反馈，不等插件回调
+          this.setData({ voiceState: "rec", voiceText: "", voiceTip: "" });
+          console.log("[voice] start ok");
+        } catch (err) {
+          console.error("[voice] start error", err);
+          wx.showToast({ title: "录音启动失败：" + (err && err.errMsg ? err.errMsg : "未知错误"), icon: "none", duration: 3000 });
+        }
+      };
+      wx.getSetting({
+        success: (r) => {
+          console.log("[voice] authSetting", JSON.stringify(r.authSetting));
+          if (r.authSetting["scope.record"] === false) {
+            wx.showModal({
+              title: "需要麦克风权限",
+              content: "请在设置中允许使用麦克风后，再使用语音输入",
+              confirmText: "去设置",
+              success: (res) => {
+                if (res.confirm) wx.openSetting({});
+              }
+            });
+            return;
+          }
+          if (r.authSetting["scope.record"] === true) {
+            startRec();
+            return;
+          }
           wx.authorize({
             scope: "scope.record",
             success: startRec,
-            fail: () => {
-              wx.showModal({ title: "需要麦克风权限", content: "请允许使用麦克风后，再尝试语音输入", showCancel: false });
+            fail: (err) => {
+              console.error("[voice] authorize fail", err);
+              wx.showModal({
+                title: "需要麦克风权限",
+                content: "请允许使用麦克风后，再尝试语音输入",
+                showCancel: false
+              });
             }
           });
-        } else {
-          startRec();
+        },
+        fail: (err) => {
+          console.error("[voice] getSetting fail", err);
+          wx.showToast({ title: "权限检查失败，请重试", icon: "none" });
         }
-      }
-    });
+      });
+    } catch (err) {
+      console.error("[voice] tap error", err);
+      wx.showToast({ title: "语音功能异常：" + (err && err.message ? err.message : "未知错误"), icon: "none", duration: 3000 });
+    }
   },
 
   // 识别完成：解析并填入对应输入框
