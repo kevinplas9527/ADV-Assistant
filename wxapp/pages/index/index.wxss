@@ -1,22 +1,22 @@
 .app {
-  padding: 18rpx;
+  padding: 24rpx;
 }
 
 /* 头部 */
 .app-header {
   display: flex;
   align-items: center;
-  margin: 2rpx 0 8rpx;
+  margin: 6rpx 0 16rpx;
 }
 
 .logo-img {
-  width: 70rpx;
-  height: 70rpx;
+  width: 72rpx;
+  height: 72rpx;
   border-radius: 12rpx;
   background: #fff;
   border: 1rpx solid #dde3ec;
   padding: 5rpx;
-  margin-right: 14rpx;
+  margin-right: 16rpx;
   flex-shrink: 0;
 }
 
@@ -39,13 +39,13 @@
 .tabbar {
   display: flex;
   border-bottom: 2rpx solid #eef1f6;
-  margin-bottom: 12rpx;
+  margin-bottom: 18rpx;
 }
 
 .tab {
   flex: 1;
   text-align: center;
-  padding: 10rpx 0 8rpx;
+  padding: 12rpx 0 10rpx;
   font-size: 32rpx;
   font-weight: 600;
   color: #9aa7bc;
@@ -71,8 +71,8 @@
 .card {
   background: #fff;
   border-radius: 16rpx;
-  padding: 20rpx;
-  margin-bottom: 14rpx;
+  padding: 24rpx;
+  margin-bottom: 18rpx;
   box-shadow: 0 2rpx 6rpx rgba(31, 39, 51, 0.05);
 }
 
@@ -80,7 +80,7 @@
   font-size: 33rpx;
   font-weight: 700;
   color: #1748c9;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
 }
 
 /* 表单 */
@@ -91,7 +91,7 @@
 
 .form-grid .field {
   width: 50%;
-  padding: 0 8rpx 12rpx;
+  padding: 0 8rpx 14rpx;
   box-sizing: border-box;
 }
 
@@ -130,7 +130,7 @@ input,
 .shape-tabs {
   display: flex;
   gap: 12rpx;
-  margin: 2rpx 0 10rpx;
+  margin: 6rpx 0 12rpx;
 }
 
 .shape-btn {
@@ -172,7 +172,7 @@ input,
 .mode-tabs {
   display: flex;
   gap: 12rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
 }
 
 .mode-btn {
@@ -196,7 +196,7 @@ input,
 /* 计算按钮 */
 .calc-btn {
   width: 100%;
-  padding: 16rpx 0;
+  padding: 18rpx 0;
   background: #1e5eff;
   color: #fff;
   border-radius: 12rpx;
@@ -332,7 +332,7 @@ input,
 /* 页脚 */
 .app-footer {
   text-align: center;
-  padding: 8rpx 0 22rpx;
+  padding: 14rpx 0 28rpx;
 }
 
 .slogan {
@@ -351,5 +351,5 @@ input,
 .footer-note {
   font-size: 24rpx;
   color: #6b7686;
-  margin-top: 20rpx;
+  margin-top: 24rpx;
 }
