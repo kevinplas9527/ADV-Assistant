@@ -1,6 +1,4 @@
 .app {
-  max-width: 750rpx;
-  margin: 0 auto;
   padding: 24rpx;
   min-height: 100vh;
   box-sizing: border-box;
@@ -51,12 +49,14 @@
 
 .form-grid {
   display: flex;
-  gap: 12rpx;
+  flex-wrap: wrap;
   margin-bottom: 14rpx;
 }
 
-.form-grid.two .field {
-  flex: 1;
+.form-grid .field {
+  width: 50%;
+  padding: 0 8rpx 14rpx;
+  box-sizing: border-box;
 }
 
 .field .label {
@@ -79,7 +79,6 @@
 
 /* 测算按钮（与首页统一） */
 .calc-btn {
-  margin-top: 4rpx;
   background: #1e5eff;
   color: #fff;
   font-size: 37rpx;
@@ -98,23 +97,23 @@
   opacity: 0.85;
 }
 
-/* 切割类型切换 */
+/* 切割类型切换（与首页模式按钮统一） */
 .cut-type-tabs {
   display: flex;
   gap: 12rpx;
-  margin-bottom: 14rpx;
+  margin-bottom: 12rpx;
 }
 
 .cut-type-btn {
   flex: 1;
   text-align: center;
-  padding: 10rpx 0 8rpx;
+  padding: 8rpx 0;
   border: 1rpx solid #dde3ec;
   border-radius: 12rpx;
   background: #fff;
-  font-size: 29rpx;
+  font-size: 28rpx;
   font-weight: 600;
-  color: #1e5eff;
+  color: #6b7686;
 }
 
 .cut-type-btn.active {
@@ -128,9 +127,9 @@
   color: #f08c00;
 }
 
-/* 反算结果提示（蓝色加粗） */
+/* 反算结果提示（蓝色加粗，与首页统一） */
 .solve-msg {
-  margin-bottom: 14rpx;
+  margin-bottom: 12rpx;
   padding: 12rpx 16rpx;
   border-radius: 12rpx;
   background: #eef3ff;
@@ -159,7 +158,7 @@
 
 .cut-num {
   color: #1e5eff;
-  font-size: 52rpx;
+  font-size: 48rpx;
   font-weight: 800;
 }
 
