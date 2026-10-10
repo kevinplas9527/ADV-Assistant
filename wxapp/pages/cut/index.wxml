@@ -47,7 +47,7 @@
         </view>
       </view>
       <!-- 板材 3D 模型示意（随输入实时更新） -->
-      <view class="plate-model">
+      <view class="model-box">
         <image class="pm-img" src="/images/icon-plate.png" mode="aspectFit"></image>
         <view class="pm-dim pm-l">长 {{plateL || '—'}}</view>
         <view class="pm-dim pm-w">宽 {{plateW || '—'}}</view>
@@ -93,6 +93,12 @@
           <view class="label">目标件数（反算用）</view>
           <input placeholder-class="input-ph" class="{{rodTargetNEdited ? 'edited' : ''}}" type="number" value="{{rodTargetN}}" data-field="rodTargetN" bindinput="onRodTargetNInput" placeholder="留空按常规测算" />
         </view>
+      </view>
+      <!-- 棒/管 3D 模型示意（随输入实时更新） -->
+      <view class="model-box">
+        <image class="pm-img" src="/images/icon-rod.png" mode="aspectFit"></image>
+        <view class="pm-dim pm-l">长度 {{rodLen || '—'}}</view>
+        <view class="pm-dim pm-w">直径 {{rodDia || '—'}}</view>
       </view>
       <button class="calc-btn" bindtap="onRodCut">测 算</button>
     </block>

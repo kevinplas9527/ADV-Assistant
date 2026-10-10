@@ -127,10 +127,10 @@
   color: #f08c00;
 }
 
-/* 板材 3D 模型示意 */
-.plate-model {
+/* 3D 模型示意（板材 / 棒管统一，随输入实时更新） */
+.model-box {
   position: relative;
-  height: 250rpx;
+  height: 210rpx;
   background: #fbfcff;
   border: 1rpx dashed #dce4f0;
   border-radius: 12rpx;
@@ -142,8 +142,8 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 300rpx;
-  height: 200rpx;
+  width: 340rpx;
+  height: 180rpx;
   transform: translate(-50%, -50%);
 }
 
@@ -160,19 +160,19 @@
 }
 
 .pm-l {
-  bottom: 10rpx;
+  bottom: 6rpx;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .pm-w {
-  top: 12rpx;
-  left: 16rpx;
+  top: 8rpx;
+  left: 12rpx;
 }
 
 .pm-t {
   top: 50%;
-  right: 10rpx;
+  right: 8rpx;
   transform: translateY(-50%);
 }
 
