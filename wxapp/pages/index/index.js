@@ -317,8 +317,10 @@ Page({
     patch.solveMsg = "✓ 反算" + miss.label + " = " + this.formatNum(result) + " mm（按目标 " + this.formatNum(tWeight) + " kg）";
     patch.solveMsgWarn = false;
     this.setData(patch);
-    // 联动刷新重量显示（保留橙色）
+    // 联动刷新重量显示（保留结果消息）
     this.calcNormal(density, true);
+    // 反算成功自动复位：单件重量回归常规色，下次默认常规计算
+    this.setData({ solveWeightEdited: false });
   },
 
   onCopy() {

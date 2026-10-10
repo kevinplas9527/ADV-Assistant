@@ -306,8 +306,10 @@
     solveMsg.classList.remove("hidden");
     solveMsg.classList.remove("warn");
     solveMsg.textContent = "✓ 反算" + miss.label + " = " + formatNum(result) + " mm（按目标 " + formatNum(tWeight) + " kg）";
-    // 联动刷新重量显示（保留橙色）
+    // 联动刷新重量显示（保留结果消息）
     calcNormal(density, true);
+    // 反算成功自动复位：单件重量回归常规色，下次默认常规计算
+    targetWeight.classList.remove("edited");
   }
 
   calcBtn.addEventListener("click", calc);
@@ -611,7 +613,7 @@
     var missing = (W === null ? 1 : 0) + (H === null ? 1 : 0);
 
     if (missing === 0) {
-      if (hasTarget) {
+      if (hasTarget && cutTargetN.classList.contains("edited")) {
         runCut(W, H, bw, bh, kerf, "⚠ 目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸");
       } else {
         cutTargetN.classList.remove("edited");
@@ -636,6 +638,8 @@
       var newW = W === null ? need : W;
       var newH = H === null ? need : H;
       runCut(newW, newH, bw, bh, kerf, "", true);
+      // 反算成功自动复位：目标块数回归常规色，下次默认常规测算
+      cutTargetN.classList.remove("edited");
       return;
     }
 

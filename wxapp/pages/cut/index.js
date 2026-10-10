@@ -264,7 +264,7 @@ Page({
     const missing = (W === null ? 1 : 0) + (H === null ? 1 : 0);
 
     if (missing === 0) {
-      if (hasTarget) {
+      if (hasTarget && d.targetNEdited) {
         this.runCut(W, H, bw, bh, kerf, "⚠ 目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸", false);
       } else {
         this.setData({ targetNEdited: false });
@@ -290,6 +290,8 @@ Page({
       const newW = W === null ? need : W;
       const newH = H === null ? need : H;
       this.runCut(newW, newH, bw, bh, kerf, "", true);
+      // 反算成功自动复位：目标块数回归常规色，下次默认常规测算
+      this.setData({ targetNEdited: false });
       return;
     }
 
