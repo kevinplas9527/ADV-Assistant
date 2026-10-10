@@ -397,3 +397,11 @@
   text-decoration: underline;
   padding: 8rpx 0 4rpx;
 }
+
+/* 版权行（与首页统一） */
+.copyright {
+  margin-top: 12rpx;
+  font-size: 20rpx;
+  color: #a8b1bd;
+  letter-spacing: 0;
+}
