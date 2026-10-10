@@ -342,7 +342,7 @@ Page({
     });
   },
 
-  // 跳转板材切割测算
+  // 跳转板棒材切割测算
   onGoCut() {
     wx.navigateTo({ url: "/pages/cut/index" });
   }
