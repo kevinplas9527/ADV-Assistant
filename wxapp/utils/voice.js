@@ -42,17 +42,20 @@ function parseVoice(text, schema) {
   const values = {};
   const labels = [];
   if (!text) return { values, labels };
+  let rest = text;
   for (const item of schema) {
     for (const k of item.keys) {
       const re = new RegExp(
         k + '\\s*[为是等于]?\\s*(\\d+(?:\\.\\d+)?|[零一二两三四五六七八九十百千万]+(?:\\.?[零一二三四五六七八九]+)?)'
       );
-      const m = text.match(re);
+      const m = rest.match(re);
       if (m) {
         const v = cnToNum(m[1]);
         if (v && !Number.isNaN(Number(v))) {
           values[item.field] = v;
           labels.push(item.label + v);
+          // 抹除已匹配片段，避免被后续短关键词（如“长”匹配“下料长”）重复捕获
+          rest = rest.replace(m[0], ' '.repeat(m[0].length));
           break;
         }
       }

@@ -43,11 +43,11 @@
       </view>
       <view class="form-grid two">
         <view class="field">
-          <view class="label">块长（mm）</view>
+          <view class="label">下料长（mm）</view>
           <input placeholder-class="input-ph" type="digit" value="{{blockL}}" data-field="blockL" bindinput="onInput" placeholder="如 90" />
         </view>
         <view class="field">
-          <view class="label">块宽（mm）</view>
+          <view class="label">下料宽（mm）</view>
           <input placeholder-class="input-ph" type="digit" value="{{blockW}}" data-field="blockW" bindinput="onInput" placeholder="如 100" />
         </view>
       </view>
@@ -91,7 +91,7 @@
       </view>
       <view class="form-grid two">
         <view class="field">
-          <view class="label">单件长度（mm）</view>
+          <view class="label">下料长度（mm）</view>
           <input placeholder-class="input-ph" type="digit" value="{{rodPiece}}" data-field="rodPiece" bindinput="onRodInput" placeholder="如 40" />
         </view>
         <view class="field">

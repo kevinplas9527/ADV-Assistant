@@ -8,18 +8,20 @@ try {
   voicePlugin = null;
 }
 
-// 按当前切割模式生成字段映射
+// 按当前切割模式生成字段映射（长关键词在前，避免短关键词误捕）
 function voiceSchema(cutType) {
   if (cutType === "rod") {
     return [
+      { keys: ["下料长度", "下料长"], field: "rodPiece", label: "下料长度" },
       { keys: ["长度", "长"], field: "rodLen", label: "长度" },
       { keys: ["直径", "径"], field: "rodDia", label: "直径" },
-      { keys: ["单件", "每件", "件长"], field: "rodPiece", label: "单件" },
       { keys: ["夹持"], field: "rodClamp", label: "夹持" },
       { keys: ["刀缝", "缝"], field: "rodKerf", label: "刀缝" }
     ];
   }
   return [
+    { keys: ["下料长"], field: "blockL", label: "下料长" },
+    { keys: ["下料宽"], field: "blockW", label: "下料宽" },
     { keys: ["长", "长度"], field: "plateL", label: "长" },
     { keys: ["宽", "宽度"], field: "plateW", label: "宽" },
     { keys: ["厚", "厚度"], field: "cutThickness", label: "厚" },
