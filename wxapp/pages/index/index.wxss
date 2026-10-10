@@ -1,22 +1,22 @@
 .app {
-  padding: 20rpx;
+  padding: 18rpx;
 }
 
 /* 头部 */
 .app-header {
   display: flex;
   align-items: center;
-  margin: 2rpx 0 10rpx;
+  margin: 2rpx 0 8rpx;
 }
 
 .logo-img {
-  width: 72rpx;
-  height: 72rpx;
+  width: 70rpx;
+  height: 70rpx;
   border-radius: 12rpx;
   background: #fff;
   border: 1rpx solid #dde3ec;
-  padding: 6rpx;
-  margin-right: 16rpx;
+  padding: 5rpx;
+  margin-right: 14rpx;
   flex-shrink: 0;
 }
 
@@ -25,12 +25,12 @@
 }
 
 .title {
-  font-size: 36rpx;
+  font-size: 40rpx;
   font-weight: 700;
 }
 
 .subtitle {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #6b7686;
   margin-top: 2rpx;
 }
@@ -39,14 +39,14 @@
 .tabbar {
   display: flex;
   border-bottom: 2rpx solid #eef1f6;
-  margin-bottom: 14rpx;
+  margin-bottom: 12rpx;
 }
 
 .tab {
   flex: 1;
   text-align: center;
-  padding: 12rpx 0 10rpx;
-  font-size: 30rpx;
+  padding: 10rpx 0 8rpx;
+  font-size: 32rpx;
   font-weight: 600;
   color: #9aa7bc;
   position: relative;
@@ -71,13 +71,13 @@
 .card {
   background: #fff;
   border-radius: 16rpx;
-  padding: 22rpx;
-  margin-bottom: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 14rpx;
   box-shadow: 0 2rpx 6rpx rgba(31, 39, 51, 0.05);
 }
 
 .card-title {
-  font-size: 30rpx;
+  font-size: 33rpx;
   font-weight: 700;
   color: #1748c9;
   margin-bottom: 12rpx;
@@ -104,7 +104,7 @@
 }
 
 .label {
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: #6b7686;
   margin-bottom: 6rpx;
 }
@@ -112,13 +112,13 @@
 input,
 .picker-value {
   width: 100%;
-  padding: 12rpx 16rpx;
+  padding: 10rpx 14rpx;
   border: 1rpx solid #dde3ec;
   border-radius: 12rpx;
-  font-size: 30rpx;
+  font-size: 33rpx;
   background: #fff;
   box-sizing: border-box;
-  min-height: 60rpx;
+  min-height: 62rpx;
 }
 
 .picker-value {
@@ -130,13 +130,13 @@ input,
 .shape-tabs {
   display: flex;
   gap: 12rpx;
-  margin: 4rpx 0 12rpx;
+  margin: 2rpx 0 10rpx;
 }
 
 .shape-btn {
   flex: 1;
   text-align: center;
-  padding: 10rpx 0 8rpx;
+  padding: 8rpx 0 6rpx;
   border: 1rpx solid #dde3ec;
   border-radius: 12rpx;
   color: #1e5eff;
@@ -152,7 +152,7 @@ input,
 }
 
 .shape-text {
-  font-size: 27rpx;
+  font-size: 29rpx;
   font-weight: 600;
   color: #6b7686;
 }
@@ -163,8 +163,8 @@ input,
 
 /* 形态简笔图（3D 线框图标） */
 .shape-icon {
-  width: 48rpx;
-  height: 48rpx;
+  width: 44rpx;
+  height: 44rpx;
   margin-bottom: 4rpx;
 }
 
@@ -178,10 +178,10 @@ input,
 .mode-btn {
   flex: 1;
   text-align: center;
-  padding: 10rpx 0;
+  padding: 8rpx 0;
   border: 1rpx solid #dde3ec;
   border-radius: 12rpx;
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: #6b7686;
   background: #fff;
@@ -196,11 +196,11 @@ input,
 /* 计算按钮 */
 .calc-btn {
   width: 100%;
-  padding: 18rpx 0;
+  padding: 16rpx 0;
   background: #1e5eff;
   color: #fff;
   border-radius: 12rpx;
-  font-size: 34rpx;
+  font-size: 37rpx;
   font-weight: 700;
   letter-spacing: 8rpx;
   line-height: 1.6;
@@ -212,8 +212,8 @@ input,
 
 /* 结果 */
 .result {
-  margin-top: 14rpx;
-  padding-top: 14rpx;
+  margin-top: 12rpx;
+  padding-top: 12rpx;
   border-top: 2rpx dashed #dde3ec;
 }
 
@@ -236,36 +236,36 @@ input,
   background: #f7faff;
   border: 1rpx solid #e3eaf8;
   border-radius: 12rpx;
-  padding: 16rpx 10rpx;
+  padding: 14rpx 10rpx;
   margin: 0 10rpx 12rpx;
   width: calc(50% - 20rpx);
 }
 
 .result-label {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #6b7686;
   margin-bottom: 4rpx;
 }
 
 .result-value {
-  font-size: 44rpx;
+  font-size: 48rpx;
   font-weight: 800;
   color: #1748c9;
 }
 
 .result-unit {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #6b7686;
   margin-top: 2rpx;
 }
 
 .formula {
   margin-top: 10rpx;
-  font-size: 25rpx;
+  font-size: 26rpx;
   color: #6b7686;
   background: #f5f7fb;
   border-radius: 12rpx;
-  padding: 14rpx 18rpx;
+  padding: 12rpx 16rpx;
   white-space: pre-wrap;
   word-break: break-all;
   font-family: Menlo, Consolas, monospace;
@@ -293,7 +293,7 @@ input,
   border: none;
   outline: none;
   background: transparent;
-  font-size: 44rpx;
+  font-size: 48rpx;
   font-weight: 800;
   color: #1748c9;
   text-align: center;
@@ -315,7 +315,7 @@ input,
   background: #eef3ff;
   border: 1rpx solid #c9d8ff;
   color: #1e5eff;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 700;
   line-height: 1.6;
 }
@@ -325,20 +325,20 @@ input,
   background: #fff2e0;
   border: 1.5rpx solid #ffc78f;
   color: #e8590c;
-  font-size: 29rpx;
+  font-size: 31rpx;
   font-weight: 800;
 }
 
 /* 页脚 */
 .app-footer {
   text-align: center;
-  padding: 10rpx 0 24rpx;
+  padding: 8rpx 0 22rpx;
 }
 
 .slogan {
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
-  font-size: 32rpx;
+  font-size: 34rpx;
   font-weight: 700;
   letter-spacing: 4rpx;
   background: linear-gradient(90deg, #1e5eff, #7aa5ff 50%, #1e5eff);
@@ -349,7 +349,7 @@ input,
 }
 
 .footer-note {
-  font-size: 23rpx;
+  font-size: 24rpx;
   color: #6b7686;
-  margin-top: 22rpx;
+  margin-top: 20rpx;
 }
