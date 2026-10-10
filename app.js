@@ -781,68 +781,36 @@
     var targetN = parseInt(rodTargetN.value, 10);
     var hasTarget = isFinite(targetN) && targetN > 0;
 
-    if (p === null && L === null) {
-      alert("请填写材料长度和单件长度（mm）");
-      return;
-    }
-
-    var missing = (L === null ? 1 : 0) + (p === null ? 1 : 0);
-
-    // 常规测算
-    if (missing === 0) {
-      if (hasTarget && rodTargetN.classList.contains("edited")) {
-        rodRun(L, p, clamp, k, 0, "⚠ 目标件数用于反算：清空材料长度或单件长度后点测算，可反算对应尺寸", false);
-        rodResultCard.classList.remove("hidden");
+    // 反算：按目标件数调整材料长度
+    if (hasTarget) {
+      if (p === null) {
+        alert("请填写单件长度（mm）后反算材料长度");
         return;
       }
-      rodTargetN.classList.remove("edited");
-      if (L < clamp + p) {
-        alert("材料长度不足以切出 1 件（需 ≥ " + formatNum(clamp + p) + " mm，含夹持）");
-        return;
-      }
-      var n = Math.floor((L - clamp + k) / (p + k));
-      rodRun(L, p, clamp, k, n, clampRaw === "" ? "夹持按推荐值 20 mm 计" : "", false);
-      return;
-    }
-
-    // 反算
-    if (missing === 1 && hasTarget) {
-      var need;
-      var missName;
-      if (L === null) {
-        // 反算材料长度
-        need = clamp + targetN * p + (targetN - 1) * k;
-        missName = "材料长度";
-        document.getElementById("rod-len").value = String(Math.round(need * 1000) / 1000);
-      } else {
-        // 反算单件长度
-        var remain = L - clamp - (targetN - 1) * k;
-        if (remain <= 0) {
-          alert("材料长度不足，无法满足目标件数");
-          return;
-        }
-        need = remain / targetN;
-        missName = "单件长度";
-        document.getElementById("rod-piece").value = String(Math.round(need * 1000) / 1000);
-      }
+      var need = clamp + targetN * p + (targetN - 1) * k;
+      document.getElementById("rod-len").value = String(Math.round(need * 1000) / 1000);
       rodMsg.classList.remove("hidden");
       rodMsg.classList.remove("warn");
-      rodMsg.textContent = "✓ 反算" + missName + " = " + formatNum(need) + " mm（按目标 " + targetN + " 件，最小需）";
-      var newL = L === null ? need : L;
-      var newP = p === null ? need : p;
+      rodMsg.textContent = "✓ 反算材料长度 = " + formatNum(need) + " mm（按目标 " + targetN + " 件）";
       // 反算成功后：清空目标件数、复位颜色，结果区显示目标
       rodTargetN.value = "";
       rodTargetN.classList.remove("edited");
-      rodRun(newL, newP, clamp, k, targetN, "", true, "（目标 " + targetN + " 件）");
+      rodRun(need, p, clamp, k, targetN, "", true, "（目标 " + targetN + " 件）");
       return;
     }
 
-    if (missing > 1) {
-      alert("反算时只能留空材料长度或单件长度之一");
+    // 常规测算
+    if (L === null || p === null) {
+      alert("请填写材料长度和单件长度（mm）");
       return;
     }
-
-    alert("请输入目标件数后再反算（修改目标件数并留空材料长度或单件长度）");
+    if (L < clamp + p) {
+      alert("材料长度不足以切出 1 件（需 ≥ " + formatNum(clamp + p) + " mm，含夹持）");
+      return;
+    }
+    rodTargetN.classList.remove("edited");
+    var n = Math.floor((L - clamp + k) / (p + k));
+    rodRun(L, p, clamp, k, n, clampRaw === "" ? "夹持按推荐值 20 mm 计" : "", false);
   }
 
   document.getElementById("rod-btn").addEventListener("click", rodCalc);

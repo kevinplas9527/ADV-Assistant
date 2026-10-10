@@ -461,64 +461,36 @@ Page({
     const targetN = parseInt(d.rodTargetN, 10);
     const hasTarget = isFinite(targetN) && targetN > 0;
 
-    if (p === null && L === null) {
+    // 反算：按目标件数调整材料长度
+    if (hasTarget) {
+      if (p === null) {
+        wx.showToast({ title: "请填写单件长度（mm）后反算材料长度", icon: "none" });
+        return;
+      }
+      const need = clamp + targetN * p + (targetN - 1) * k;
+      this.setData({
+        rodLen: String(Math.round(need * 1000) / 1000),
+        rodMsg: "✓ 反算材料长度 = " + this.formatNum(need) + " mm（按目标 " + targetN + " 件）",
+        rodMsgWarn: false
+      });
+      // 反算成功后：清空目标件数、复位颜色，结果区显示目标
+      this.setData({ rodTargetN: "", rodTargetNEdited: false });
+      this.rodRun(need, p, clamp, k, targetN, "", true, "（目标 " + targetN + " 件）");
+      return;
+    }
+
+    // 常规测算
+    if (L === null || p === null) {
       wx.showToast({ title: "请填写材料长度和单件长度（mm）", icon: "none" });
       return;
     }
-
-    const missing = (L === null ? 1 : 0) + (p === null ? 1 : 0);
-
-    if (missing === 0) {
-      if (hasTarget && d.rodTargetNEdited) {
-        this.rodRun(L, p, clamp, k, 0, "⚠ 目标件数用于反算：清空材料长度或单件长度后点测算，可反算对应尺寸", false);
-        this.setData({ showRodResult: true });
-        return;
-      }
-      this.setData({ rodTargetNEdited: false });
-      if (L < clamp + p) {
-        wx.showToast({ title: "材料长度不足以切出 1 件（需 ≥ " + this.formatNum(clamp + p) + " mm）", icon: "none" });
-        return;
-      }
-      const n = Math.floor((L - clamp + k) / (p + k));
-      this.rodRun(L, p, clamp, k, n, d.rodClamp === "" ? "夹持按推荐值 20 mm 计" : "", false);
+    if (L < clamp + p) {
+      wx.showToast({ title: "材料长度不足以切出 1 件（需 ≥ " + this.formatNum(clamp + p) + " mm）", icon: "none" });
       return;
     }
-
-    if (missing === 1 && hasTarget) {
-      let need;
-      let missName;
-      const patch = {};
-      if (L === null) {
-        need = clamp + targetN * p + (targetN - 1) * k;
-        missName = "材料长度";
-        patch.rodLen = String(Math.round(need * 1000) / 1000);
-      } else {
-        const remain = L - clamp - (targetN - 1) * k;
-        if (remain <= 0) {
-          wx.showToast({ title: "材料长度不足，无法满足目标件数", icon: "none" });
-          return;
-        }
-        need = remain / targetN;
-        missName = "单件长度";
-        patch.rodPiece = String(Math.round(need * 1000) / 1000);
-      }
-      patch.rodMsg = "✓ 反算" + missName + " = " + this.formatNum(need) + " mm（按目标 " + targetN + " 件，最小需）";
-      patch.rodMsgWarn = false;
-      this.setData(patch);
-      const newL = L === null ? need : L;
-      const newP = p === null ? need : p;
-      // 反算成功后：清空目标件数、复位颜色，结果区显示目标
-      this.setData({ rodTargetN: "", rodTargetNEdited: false });
-      this.rodRun(newL, newP, clamp, k, targetN, "", true, "（目标 " + targetN + " 件）");
-      return;
-    }
-
-    if (missing > 1) {
-      wx.showToast({ title: "反算时只能留空材料长度或单件长度之一", icon: "none" });
-      return;
-    }
-
-    wx.showToast({ title: "请输入目标件数后再反算", icon: "none" });
+    this.setData({ rodTargetNEdited: false });
+    const n = Math.floor((L - clamp + k) / (p + k));
+    this.rodRun(L, p, clamp, k, n, d.rodClamp === "" ? "夹持按推荐值 20 mm 计" : "", false);
   },
 
   drawCut(blocks, W, H) {
