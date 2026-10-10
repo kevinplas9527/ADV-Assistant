@@ -19,7 +19,6 @@ Page({
 
     // 切割类型与棒/管
     cutType: "plate", // plate | rod
-    rodShape: "rod", // rod | tube
     rodLen: "",
     rodDia: "",
     rodPiece: "",
@@ -32,7 +31,6 @@ Page({
     rodTargetShow: "",
     showRodResult: false,
     rodCount: 0,
-    rodShapeName: "棒材",
     rodUsed: "",
     rodTail: "",
     rodRatio: "",
@@ -48,11 +46,6 @@ Page({
   // 切割类型切换
   onCutTypeTap(e) {
     this.setData({ cutType: e.currentTarget.dataset.type });
-  },
-
-  // 棒/管形态切换
-  onRodShapeTap(e) {
-    this.setData({ rodShape: e.currentTarget.dataset.shape });
   },
 
   onRodInput(e) {
@@ -363,7 +356,6 @@ Page({
     this.setData({
       showRodResult: true,
       rodCount: n,
-      rodShapeName: this.data.rodShape === "tube" ? "管材" : "棒材",
       rodLen: L,
       rodPiece: p,
       rodClamp: clamp,

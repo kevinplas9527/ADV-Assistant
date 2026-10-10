@@ -411,9 +411,8 @@ body {
   background: #fbfcff;
 }
 
-/* 切割类型切换 / 棒管形态切换（纯文字小按钮） */
-.cut-type-tabs .shape-btn,
-.rod-shape-tabs .shape-btn {
+/* 切割类型切换（纯文字小按钮） */
+.cut-type-tabs .shape-btn {
   flex-direction: row;
   justify-content: center;
   gap: 0;
@@ -423,10 +422,6 @@ body {
 
 .cut-type-tabs {
   margin-top: 0;
-}
-
-.rod-shape-tabs {
-  margin: 0 0 14px;
 }
 
 /* 页脚 */

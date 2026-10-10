@@ -51,10 +51,6 @@
 
     <!-- 棒/管参数 -->
     <block wx:if="{{cutType === 'rod'}}">
-      <view class="rod-shape-tabs">
-        <view class="cut-type-btn {{rodShape === 'rod' ? 'active' : ''}}" data-shape="rod" bindtap="onRodShapeTap">棒材</view>
-        <view class="cut-type-btn {{rodShape === 'tube' ? 'active' : ''}}" data-shape="tube" bindtap="onRodShapeTap">管材</view>
-      </view>
       <view class="form-grid two">
         <view class="field">
           <view class="label">材料长度（mm）</view>
@@ -109,7 +105,7 @@
     <block wx:if="{{cutType === 'rod'}}">
       <view class="solve-msg {{rodMsgWarn ? 'warn' : ''}}" wx:if="{{rodMsg}}">{{rodMsg}}</view>
       <view class="cut-count">可切 <text class="cut-num">{{rodCount}}</text> 件<text class="cut-target" wx:if="{{rodTargetShow}}">{{rodTargetShow}}</text></view>
-      <view class="cut-meta">{{rodShapeName}} {{rodLen}} mm ｜ 单件 {{rodPiece}} mm ｜ 夹持 {{rodClamp}} mm ｜ 刀缝 {{rodKerf}} mm</view>
+      <view class="cut-meta">棒/管材料 {{rodLen}} mm ｜ 单件 {{rodPiece}} mm ｜ 夹持 {{rodClamp}} mm ｜ 刀缝 {{rodKerf}} mm</view>
       <view class="cut-meta">占用 {{rodUsed}} mm（夹持 {{rodClamp}} + {{rodCount}}×{{rodPiece}} + {{rodKerfCount}}×{{rodKerf}}）｜ 余料 {{rodTail}} mm</view>
       <view class="cut-meta">材料利用率 {{rodRatio}}%</view>
       <view class="cut-legend">

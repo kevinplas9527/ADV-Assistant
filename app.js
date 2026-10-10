@@ -653,14 +653,13 @@
     alert("请输入目标块数后再反算（修改目标块数并留空板材长或板材宽）");
   });
 
-  // ---------- 棒/管切割 ----------
+  // 棒/管切割
   var rodMsg = document.getElementById("rod-msg");
   var rodTargetN = document.getElementById("rod-target-n");
   var rodPanelPlate = document.getElementById("cut-panel-plate");
   var rodPanelRod = document.getElementById("cut-panel-rod");
   var cutResultCard = document.getElementById("cut-result-card");
   var rodResultCard = document.getElementById("rod-result-card");
-  var rodShape = "rod"; // rod | tube
   var ROD_RECOMMEND_CLAMP = 20; // 工程塑料常用夹持推荐值（mm）
 
   // 切割类型切换：板材 / 棒管
@@ -674,17 +673,6 @@
       rodPanelRod.classList.toggle("hidden", isPlate);
       cutResultCard.classList.toggle("hidden", !isPlate);
       rodResultCard.classList.toggle("hidden", isPlate);
-    });
-  });
-
-  // 棒/管形态切换
-  document.querySelectorAll("[data-rods]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      document.querySelectorAll("[data-rods]").forEach(function (b) {
-        b.classList.toggle("active", b === btn);
-      });
-      rodShape = btn.getAttribute("data-rods");
-      document.getElementById("rod-result-card").querySelector("h2").textContent = "② 测算结果";
     });
   });
 
@@ -760,11 +748,10 @@
     var used = clamp + n * p + (n - 1) * k;
     var tail = Math.max(0, L - used);
     var ratio = ((n * p) / L) * 100;
-    var rodShapeName = rodShape === "tube" ? "管材" : "棒材";
     document.getElementById("rod-summary").innerHTML =
       "<div class='cut-count'>可切 <b>" + n + "</b> 件" +
       (targetText ? " <span class='cut-target'>" + targetText + "</span>" : "") + "</div>" +
-      "<div class='cut-meta'>" + rodShapeName + " " + L + " mm ｜ 单件 " + p + " mm ｜ 夹持 " + formatNum(clamp) + " mm ｜ 刀缝 " + k + " mm</div>" +
+      "<div class='cut-meta'>棒/管材料 " + L + " mm ｜ 单件 " + p + " mm ｜ 夹持 " + formatNum(clamp) + " mm ｜ 刀缝 " + k + " mm</div>" +
       "<div class='cut-meta'>占用 " + formatNum(used) + " mm（夹持 " + formatNum(clamp) + " + " + n + "×" + p + " + " + (n - 1) + "×" + k + "）｜ 余料 " + formatNum(tail) + " mm</div>" +
       "<div class='cut-meta'>材料利用率 " + ratio.toFixed(1) + "%</div>";
     rodResultCard.classList.remove("hidden");
