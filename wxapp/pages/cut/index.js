@@ -26,7 +26,9 @@ Page({
     rodDia: "",
     rodPiece: "",
     rodClamp: "",
+    rodClampPlaceholder: "推荐 20",
     rodKerf: "",
+    rodKerfPlaceholder: "如 3",
     rodTargetN: "",
     rodTargetNEdited: false,
     rodMsg: "",
@@ -54,6 +56,33 @@ Page({
   onRodInput(e) {
     const field = e.currentTarget.dataset.field;
     this.setData({ [field]: e.detail.value });
+  },
+
+  // 夹持长度按直径推荐（车床/切断机装夹惯例）
+  clampByDia(d) {
+    if (d <= 6) return 10;
+    if (d <= 12) return 15;
+    if (d <= 20) return 20;
+    if (d <= 30) return 25;
+    return 30;
+  },
+
+  // 刀缝按直径推荐（棒/管锯切常用）
+  kerfByDia(d) {
+    if (d <= 10) return 2;
+    if (d <= 20) return 3;
+    if (d <= 30) return 4;
+    return 5;
+  },
+
+  // 直径变化 → 联动夹持/刀缝推荐值（灰色 placeholder）
+  onRodDiaInput(e) {
+    const d = this.num(e.detail.value);
+    this.setData({
+      rodDia: e.detail.value,
+      rodClampPlaceholder: d !== null ? "推荐 " + this.clampByDia(d) + "（直径 " + d + " mm）" : "推荐 20",
+      rodKerfPlaceholder: d !== null ? "推荐 " + this.kerfByDia(d) + "（直径 " + d + " mm）" : "如 3"
+    });
   },
 
   onRodTargetNInput(e) {
@@ -482,10 +511,21 @@ Page({
     const d = this.data;
     const L = this.rodNum(d.rodLen);
     const p = this.rodNum(d.rodPiece);
+    const dia = this.rodNum(d.rodDia);
     let k = parseFloat(d.rodKerf);
     if (!isFinite(k) || k < 0) k = 0;
-    let clamp = d.rodClamp === "" ? 20 : parseFloat(d.rodClamp);
+    let clamp = parseFloat(d.rodClamp);
     if (!isFinite(clamp) || clamp < 0) clamp = 20;
+    // 夹持/刀缝留空：按直径推荐（未填直径用默认值）
+    const hints = [];
+    if (d.rodClamp === "") {
+      clamp = dia !== null ? this.clampByDia(dia) : 20;
+      hints.push("夹持按推荐值 " + clamp + " mm 计" + (dia !== null ? "（直径 " + dia + " mm）" : "（未填直径）"));
+    }
+    if (d.rodKerf === "") {
+      k = dia !== null ? this.kerfByDia(dia) : 3;
+      hints.push("刀缝按推荐值 " + k + " mm 计" + (dia !== null ? "（直径 " + dia + " mm）" : "（未填直径）"));
+    }
     const targetN = parseInt(d.rodTargetN, 10);
     const hasTarget = isFinite(targetN) && targetN > 0;
 
@@ -518,7 +558,7 @@ Page({
     }
     this.setData({ rodTargetNEdited: false });
     const n = Math.floor((L - clamp + k) / (p + k));
-    this.rodRun(L, p, clamp, k, n, d.rodClamp === "" ? "夹持按推荐值 20 mm 计" : "", false);
+    this.rodRun(L, p, clamp, k, n, hints.join("；"), false);
   },
 
   drawCut(blocks, W, H) {

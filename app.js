@@ -687,6 +687,33 @@
   var rodResultCard = document.getElementById("rod-result-card");
   var ROD_RECOMMEND_CLAMP = 20; // 工程塑料常用夹持推荐值（mm）
 
+  // 夹持长度按直径推荐（车床/切断机装夹惯例）
+  function clampByDia(d) {
+    if (d <= 6) return 10;
+    if (d <= 12) return 15;
+    if (d <= 20) return 20;
+    if (d <= 30) return 25;
+    return 30;
+  }
+
+  // 刀缝按直径推荐（棒/管锯切常用）
+  function kerfByDia(d) {
+    if (d <= 10) return 2;
+    if (d <= 20) return 3;
+    if (d <= 30) return 4;
+    return 5;
+  }
+
+  // 直径变化 → 联动夹持/刀缝推荐值（灰色 placeholder）
+  var rodDia = document.getElementById("rod-dia");
+  var rodClamp = document.getElementById("rod-clamp");
+  var rodKerf = document.getElementById("rod-kerf");
+  rodDia.addEventListener("input", function () {
+    var d = num("rod-dia");
+    rodClamp.placeholder = d !== null ? "推荐 " + clampByDia(d) + "（直径 " + d + " mm）" : "推荐 20";
+    rodKerf.placeholder = d !== null ? "推荐 " + kerfByDia(d) + "（直径 " + d + " mm）" : "如 3";
+  });
+
   // 切割类型切换：板材 / 棒管
   document.querySelectorAll("[data-cuttype]").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -797,12 +824,23 @@
   function rodCalc() {
     var L = num("rod-len");
     var p = num("rod-piece");
-    var k = parseFloat(document.getElementById("rod-kerf").value);
+    var dia = num("rod-dia");
+    var kRaw = document.getElementById("rod-kerf").value;
+    var k = parseFloat(kRaw);
     if (!isFinite(k) || k < 0) k = 0;
     var clampRaw = document.getElementById("rod-clamp").value;
-    var clamp = clampRaw === "" ? ROD_RECOMMEND_CLAMP : parseFloat(clampRaw);
+    var clamp = parseFloat(clampRaw);
     if (!isFinite(clamp) || clamp < 0) clamp = ROD_RECOMMEND_CLAMP;
-    var dia = document.getElementById("rod-dia").value;
+    // 夹持/刀缝留空：按直径推荐（未填直径用默认值）
+    var hints = [];
+    if (clampRaw === "") {
+      clamp = dia !== null ? clampByDia(dia) : ROD_RECOMMEND_CLAMP;
+      hints.push("夹持按推荐值 " + clamp + " mm 计" + (dia !== null ? "（直径 " + dia + " mm）" : "（未填直径）"));
+    }
+    if (kRaw === "") {
+      k = dia !== null ? kerfByDia(dia) : 3;
+      hints.push("刀缝按推荐值 " + k + " mm 计" + (dia !== null ? "（直径 " + dia + " mm）" : "（未填直径）"));
+    }
     var targetN = parseInt(rodTargetN.value, 10);
     var hasTarget = isFinite(targetN) && targetN > 0;
 
@@ -835,7 +873,7 @@
     }
     rodTargetN.classList.remove("edited");
     var n = Math.floor((L - clamp + k) / (p + k));
-    rodRun(L, p, clamp, k, n, clampRaw === "" ? "夹持按推荐值 20 mm 计" : "", false);
+    rodRun(L, p, clamp, k, n, hints.join("；"), false);
   }
 
   document.getElementById("rod-btn").addEventListener("click", rodCalc);

@@ -64,7 +64,7 @@
         </view>
         <view class="field">
           <view class="label">直径（mm）</view>
-          <input type="digit" value="{{rodDia}}" data-field="rodDia" bindinput="onRodInput" placeholder="如 50" />
+          <input type="digit" value="{{rodDia}}" data-field="rodDia" bindinput="onRodDiaInput" placeholder="如 50" />
         </view>
       </view>
       <view class="form-grid two">
@@ -74,13 +74,13 @@
         </view>
         <view class="field">
           <view class="label">夹持长度（mm）</view>
-          <input type="digit" value="{{rodClamp}}" data-field="rodClamp" bindinput="onRodInput" placeholder="推荐 20" />
+          <input type="digit" value="{{rodClamp}}" data-field="rodClamp" bindinput="onRodInput" placeholder="{{rodClampPlaceholder}}" />
         </view>
       </view>
       <view class="form-grid two">
         <view class="field">
           <view class="label">刀缝（mm）</view>
-          <input type="digit" value="{{rodKerf}}" data-field="rodKerf" bindinput="onRodInput" placeholder="如 3" />
+          <input type="digit" value="{{rodKerf}}" data-field="rodKerf" bindinput="onRodInput" placeholder="{{rodKerfPlaceholder}}" />
         </view>
         <view class="field">
           <view class="label">目标件数（反算用）</view>
