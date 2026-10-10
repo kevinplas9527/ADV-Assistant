@@ -139,6 +139,13 @@
     var hasTarget = isFinite(tWeight) && tWeight > 0;
 
     if (missing.length === 0) {
+      // 尺寸齐全：若用户已修改目标重量（橙色），提示留空变量，不覆盖目标值
+      if (hasTarget && targetWeight.classList.contains("edited")) {
+        solveMsg.classList.remove("hidden");
+        solveMsg.classList.add("warn");
+        solveMsg.textContent = "反算需留空一个尺寸（长/宽/厚/直径/长度…）再点计算；或清空单件重量进行常规计算";
+        return;
+      }
       // 常规模式：尺寸齐全 → 计算重量
       calcNormal(density, false);
     } else if (missing.length === 1 && hasTarget) {
@@ -238,9 +245,11 @@
     resultBox.classList.remove("hidden");
     copyBtn.classList.remove("hidden");
 
-    // 常规模式：重量框回到黑色；反算联动模式：保留橙色
+    // 常规模式：重量框回到黑色、清提示；反算联动模式：保留橙色
     if (!keepEdited) {
       targetWeight.classList.remove("edited");
+      solveMsg.classList.add("hidden");
+      solveMsg.classList.remove("warn");
     }
   }
 
@@ -295,6 +304,7 @@
     document.getElementById(miss.id).value = String(Math.round(result * 1000) / 1000);
     // 蓝色加粗显示反算结果
     solveMsg.classList.remove("hidden");
+    solveMsg.classList.remove("warn");
     solveMsg.textContent = "✓ 反算" + miss.label + " = " + formatNum(result) + " mm（按目标 " + formatNum(tWeight) + " kg）";
     // 联动刷新重量显示（保留橙色）
     calcNormal(density, true);

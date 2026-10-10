@@ -132,8 +132,8 @@
   <view class="card">
     <view class="card-title">③ 计算结果</view>
     <button class="calc-btn" bindtap="onCalc">计 算</button>
+    <view class="solve-msg {{solveMsgWarn ? 'warn' : ''}}" wx:if="{{solveMsg}}">{{solveMsg}}</view>
     <view class="result" wx:if="{{showResult}}">
-      <view class="solve-msg" wx:if="{{solveMsg}}">{{solveMsg}}</view>
       <view class="result-grid">
         <view class="result-item">
           <view class="result-label">单件体积</view>

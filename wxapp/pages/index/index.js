@@ -47,7 +47,8 @@ Page({
     hasCost: false,
     solveWeight: "",
     solveWeightEdited: false,
-    solveMsg: ""
+    solveMsg: "",
+    solveMsgWarn: false
   },
 
   onMaterialChange(e) {
@@ -61,11 +62,11 @@ Page({
   },
 
   onShapeTap(e) {
-    this.setData({ shape: e.currentTarget.dataset.shape, solveMsg: "" });
+    this.setData({ shape: e.currentTarget.dataset.shape, solveMsg: "", solveMsgWarn: false });
   },
 
   onTubeModeTap(e) {
-    this.setData({ tubeMode: e.currentTarget.dataset.mode, solveMsg: "" });
+    this.setData({ tubeMode: e.currentTarget.dataset.mode, solveMsg: "", solveMsgWarn: false });
   },
 
   onInput(e) {
@@ -77,7 +78,8 @@ Page({
     this.setData({
       solveWeight: e.detail.value,
       solveWeightEdited: true,
-      solveMsg: ""
+      solveMsg: "",
+      solveMsgWarn: false
     });
   },
 
@@ -137,6 +139,14 @@ Page({
     const hasTarget = isFinite(tWeight) && tWeight > 0;
 
     if (missing.length === 0) {
+      // 尺寸齐全：若用户已修改目标重量（橙色），提示留空变量，不覆盖目标值
+      if (hasTarget && d.solveWeightEdited) {
+        this.setData({
+          solveMsg: "反算需留空一个尺寸（长/宽/厚/直径/长度…）再点计算；或清空单件重量进行常规计算",
+          solveMsgWarn: true
+        });
+        return;
+      }
       // 常规模式：尺寸齐全 → 计算重量
       this.calcNormal(density, false);
     } else if (missing.length === 1 && hasTarget) {
@@ -237,6 +247,7 @@ Page({
     if (!keepEdited) {
       patch.solveWeightEdited = false;
       patch.solveMsg = "";
+      patch.solveMsgWarn = false;
     }
     this.setData(patch);
   },
@@ -304,6 +315,7 @@ Page({
     const patch = {};
     patch[miss.field] = String(Math.round(result * 1000) / 1000);
     patch.solveMsg = "✓ 反算" + miss.label + " = " + this.formatNum(result) + " mm（按目标 " + this.formatNum(tWeight) + " kg）";
+    patch.solveMsgWarn = false;
     this.setData(patch);
     // 联动刷新重量显示（保留橙色）
     this.calcNormal(density, true);
