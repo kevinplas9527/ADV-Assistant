@@ -110,6 +110,13 @@
   line-height: 1.6;
 }
 
+/* 提醒性提示（橙色） */
+.solve-msg.warn {
+  background: #fff4e6;
+  border-color: #ffd9a8;
+  color: #f08c00;
+}
+
 /* 结果 */
 .cut-count {
   font-size: 30rpx;

@@ -571,6 +571,11 @@
     if (msg) {
       cutMsg.classList.remove("hidden");
       cutMsg.textContent = msg;
+      if (msg.indexOf("目标块数用于反算") === 0) {
+        cutMsg.classList.add("warn");
+      } else {
+        cutMsg.classList.remove("warn");
+      }
     } else if (!keepMsg) {
       cutMsg.classList.add("hidden");
     }
@@ -616,6 +621,7 @@
       var missId = W === null ? "cut-plate-l" : "cut-plate-w";
       document.getElementById(missId).value = String(Math.round(need * 1000) / 1000);
       cutMsg.classList.remove("hidden");
+      cutMsg.classList.remove("warn");
       cutMsg.textContent = "✓ 反算" + missName + " = " + formatNum(need) + " mm（按目标 " + targetN + " 块，最小需）";
       var newW = W === null ? need : W;
       var newH = H === null ? need : H;

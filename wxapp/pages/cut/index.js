@@ -8,6 +8,7 @@ Page({
     targetN: "",
     targetNEdited: false,
     cutMsg: "",
+    cutMsgWarn: false,
     showResult: false,
     count: 0,
     mode: "",
@@ -33,7 +34,7 @@ Page({
   },
 
   onTargetNInput(e) {
-    this.setData({ targetN: e.detail.value, targetNEdited: true, cutMsg: "" });
+    this.setData({ targetN: e.detail.value, targetNEdited: true, cutMsg: "", cutMsgWarn: false });
   },
 
   num(v) {
@@ -212,7 +213,8 @@ Page({
       ratio: ratio,
       waste: waste.toLocaleString("zh-CN"),
       canvasHeight: 0,
-      cutMsg: msg || (keepMsg ? this.data.cutMsg : "")
+      cutMsg: msg || (keepMsg ? this.data.cutMsg : ""),
+      cutMsgWarn: !!msg && msg.indexOf("目标块数用于反算") === 0
     });
     // 等 canvas 渲染后绘制
     setTimeout(() => this.drawCut(best.blocks, W, H), 80);
@@ -258,6 +260,7 @@ Page({
       const patch = {};
       patch[missField] = String(Math.round(need * 1000) / 1000);
       patch.cutMsg = "✓ 反算" + missName + " = " + this.formatNum(need) + " mm（按目标 " + targetN + " 块，最小需）";
+      patch.cutMsgWarn = false;
       this.setData(patch);
       const newW = W === null ? need : W;
       const newH = H === null ? need : H;

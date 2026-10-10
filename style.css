@@ -330,6 +330,13 @@ body {
   font-weight: 700;
 }
 
+/* 提醒性提示（橙色） */
+.solve-msg.warn {
+  background: #fff4e6;
+  border-color: #ffd9a8;
+  color: #f08c00;
+}
+
 /* 页面导航页签 */
 .app-tabs {
   display: flex;
