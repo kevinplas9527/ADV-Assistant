@@ -18,6 +18,12 @@ Page({
   },
 
   onReady() {
+    // 注意：canvas 在 wx:if 内，首次进入尚未渲染，此处仅做预初始化（拿不到节点也正常）
+    this.initCanvas();
+  },
+
+  // 查询并缓存 canvas 节点（画布渲染后才可查询）
+  initCanvas() {
     const query = wx.createSelectorQuery().in(this);
     query.select("#cutCanvas").fields({ node: true, size: true }).exec((res) => {
       if (res && res[0] && res[0].node) {
@@ -193,6 +199,25 @@ Page({
     return bestLen;
   },
 
+  // canvas 渲染完成后初始化节点并绘制示意图
+  initCanvasAndDraw(blocks, W, H) {
+    const query = wx.createSelectorQuery().in(this);
+    query.select("#cutCanvas").fields({ node: true, size: true }).exec((res) => {
+      if (res && res[0] && res[0].node) {
+        this.canvas = res[0].node;
+        this.ctx = this.canvas.getContext("2d");
+        this.canvasCssWidth = res[0].width;
+        this.drawCut(blocks, W, H);
+      } else {
+        // 节点尚未渲染（wx:if 刚置 true），稍后重试
+        this._retry = (this._retry || 0) + 1;
+        if (this._retry <= 3) {
+          setTimeout(() => this.initCanvasAndDraw(blocks, W, H), 120);
+        }
+      }
+    });
+  },
+
   // 常规测算：排样 + 展示结果与示意图
   runCut(W, H, bw, bh, kerf, msg, keepMsg) {
     if ((bw > W && bh > W) && (bw > H && bh > H)) {
@@ -216,8 +241,8 @@ Page({
       cutMsg: msg || (keepMsg ? this.data.cutMsg : ""),
       cutMsgWarn: !!msg && msg.indexOf("目标块数用于反算") === 0
     });
-    // 等 canvas 渲染后绘制
-    setTimeout(() => this.drawCut(best.blocks, W, H), 80);
+    // 等 canvas 渲染后初始化节点并绘制
+    setTimeout(() => this.initCanvasAndDraw(best.blocks, W, H), 120);
   },
 
   onCut() {
@@ -278,8 +303,8 @@ Page({
 
   drawCut(blocks, W, H) {
     if (!this.canvas || !this.ctx) {
-      // canvas 未就绪时重试
-      setTimeout(() => this.drawCut(blocks, W, H), 100);
+      // canvas 未就绪：重新查询节点
+      this.initCanvasAndDraw(blocks, W, H);
       return;
     }
     const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
