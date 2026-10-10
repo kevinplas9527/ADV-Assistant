@@ -50,8 +50,8 @@
       <view class="model-box">
         <image class="pm-img" src="/images/icon-plate.png" mode="aspectFit"></image>
         <view class="pm-dim pm-l">长 {{plateL || '—'}}</view>
-        <view class="pm-dim pm-w">宽 {{plateW || '—'}}</view>
-        <view class="pm-dim pm-t">厚 {{cutThickness || '—'}}</view>
+        <view class="pm-dim pm-w" style="position: absolute; left: 158rpx; top: 46rpx">宽 {{plateW || '—'}}</view>
+        <view class="pm-dim pm-t" style="position: absolute; left: 424rpx; top: 87rpx; width: 95rpx; height: 37rpx; display: block; box-sizing: border-box">厚 {{cutThickness || '—'}}</view>
       </view>
       <view class="form-grid">
         <view class="field" style="flex: 1">
@@ -97,8 +97,8 @@
       <!-- 棒/管 3D 模型示意（随输入实时更新） -->
       <view class="model-box">
         <image class="pm-img" src="/images/icon-rod.png" mode="aspectFit"></image>
-        <view class="pm-dim pm-l">长度 {{rodLen || '—'}}</view>
-        <view class="pm-dim pm-w">直径 {{rodDia || '—'}}</view>
+        <view class="pm-dim pm-l" style="position: absolute; left: 204rpx; top: 87rpx; width: 135rpx; height: 37rpx; display: block; box-sizing: border-box">长度 {{rodLen || '—'}}</view>
+        <view class="pm-dim pm-w" style="position: absolute; left: 279rpx; top: 173rpx">直径 {{rodDia || '—'}}</view>
       </view>
       <button class="calc-btn" bindtap="onRodCut">测 算</button>
     </block>
