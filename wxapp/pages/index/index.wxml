@@ -26,7 +26,7 @@
       </view>
       <view class="field">
         <view class="label">密度（g/cm³）</view>
-        <input type="digit" value="{{density}}" bindinput="onDensityInput" placeholder="2.20" />
+        <input placeholder-class="input-ph" type="digit" value="{{density}}" bindinput="onDensityInput" placeholder="2.20" />
       </view>
     </view>
 
@@ -49,15 +49,15 @@
     <view class="form-grid three" wx:if="{{shape === 'plate'}}">
       <view class="field">
         <view class="label">长（mm）</view>
-        <input type="digit" placeholder="如 1000" value="{{plateL}}" data-field="plateL" bindinput="onInput" />
+        <input placeholder-class="input-ph" type="digit" placeholder="如 1000" value="{{plateL}}" data-field="plateL" bindinput="onInput" />
       </view>
       <view class="field">
         <view class="label">宽（mm）</view>
-        <input type="digit" placeholder="如 500" value="{{plateW}}" data-field="plateW" bindinput="onInput" />
+        <input placeholder-class="input-ph" type="digit" placeholder="如 500" value="{{plateW}}" data-field="plateW" bindinput="onInput" />
       </view>
       <view class="field">
         <view class="label">厚（mm）</view>
-        <input type="digit" placeholder="如 20" value="{{plateT}}" data-field="plateT" bindinput="onInput" />
+        <input placeholder-class="input-ph" type="digit" placeholder="如 20" value="{{plateT}}" data-field="plateT" bindinput="onInput" />
       </view>
     </view>
 
@@ -65,11 +65,11 @@
     <view class="form-grid two" wx:elif="{{shape === 'rod'}}">
       <view class="field">
         <view class="label">直径（mm）</view>
-        <input type="digit" placeholder="如 50" value="{{rodD}}" data-field="rodD" bindinput="onInput" />
+        <input placeholder-class="input-ph" type="digit" placeholder="如 50" value="{{rodD}}" data-field="rodD" bindinput="onInput" />
       </view>
       <view class="field">
         <view class="label">长度（mm）</view>
-        <input type="digit" placeholder="如 1000" value="{{rodL}}" data-field="rodL" bindinput="onInput" />
+        <input placeholder-class="input-ph" type="digit" placeholder="如 1000" value="{{rodL}}" data-field="rodL" bindinput="onInput" />
       </view>
     </view>
 
@@ -82,29 +82,29 @@
       <view class="form-grid three" wx:if="{{tubeMode === 'od-id'}}">
         <view class="field">
           <view class="label">外径（mm）</view>
-          <input type="digit" placeholder="如 100" value="{{tubeOd}}" data-field="tubeOd" bindinput="onInput" />
+          <input placeholder-class="input-ph" type="digit" placeholder="如 100" value="{{tubeOd}}" data-field="tubeOd" bindinput="onInput" />
         </view>
         <view class="field">
           <view class="label">内径（mm）</view>
-          <input type="digit" placeholder="如 80" value="{{tubeId}}" data-field="tubeId" bindinput="onInput" />
+          <input placeholder-class="input-ph" type="digit" placeholder="如 80" value="{{tubeId}}" data-field="tubeId" bindinput="onInput" />
         </view>
         <view class="field">
           <view class="label">长度（mm）</view>
-          <input type="digit" placeholder="如 1000" value="{{tubeL}}" data-field="tubeL" bindinput="onInput" />
+          <input placeholder-class="input-ph" type="digit" placeholder="如 1000" value="{{tubeL}}" data-field="tubeL" bindinput="onInput" />
         </view>
       </view>
       <view class="form-grid three" wx:else>
         <view class="field">
           <view class="label">外径（mm）</view>
-          <input type="digit" placeholder="如 100" value="{{tubeOd2}}" data-field="tubeOd2" bindinput="onInput" />
+          <input placeholder-class="input-ph" type="digit" placeholder="如 100" value="{{tubeOd2}}" data-field="tubeOd2" bindinput="onInput" />
         </view>
         <view class="field">
           <view class="label">壁厚（mm）</view>
-          <input type="digit" placeholder="如 10" value="{{tubeWall}}" data-field="tubeWall" bindinput="onInput" />
+          <input placeholder-class="input-ph" type="digit" placeholder="如 10" value="{{tubeWall}}" data-field="tubeWall" bindinput="onInput" />
         </view>
         <view class="field">
           <view class="label">长度（mm）</view>
-          <input type="digit" placeholder="如 1000" value="{{tubeL2}}" data-field="tubeL2" bindinput="onInput" />
+          <input placeholder-class="input-ph" type="digit" placeholder="如 1000" value="{{tubeL2}}" data-field="tubeL2" bindinput="onInput" />
         </view>
       </view>
     </view>
@@ -116,11 +116,11 @@
     <view class="form-grid two">
       <view class="field">
         <view class="label">材料单价（元/kg）</view>
-        <input type="digit" placeholder="如 80" value="{{price}}" data-field="price" bindinput="onInput" />
+        <input placeholder-class="input-ph" type="digit" placeholder="如 80" value="{{price}}" data-field="price" bindinput="onInput" />
       </view>
       <view class="field">
         <view class="label">数量（件）</view>
-        <input type="number" placeholder="如 1" value="{{qty}}" data-field="qty" bindinput="onInput" />
+        <input placeholder-class="input-ph" type="number" placeholder="如 1" value="{{qty}}" data-field="qty" bindinput="onInput" />
       </view>
     </view>
   </view>

@@ -353,3 +353,10 @@ input,
   color: #6b7686;
   margin-top: 24rpx;
 }
+
+/* 输入引导占位文字（更醒目） */
+.input-ph {
+  color: #8f9db3;
+  font-size: 30rpx;
+  font-weight: 400;
+}

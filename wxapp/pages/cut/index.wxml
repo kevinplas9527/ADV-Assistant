@@ -19,37 +19,37 @@
       <view class="form-grid two">
         <view class="field">
           <view class="label">板材长（mm）</view>
-          <input type="digit" value="{{plateL}}" data-field="plateL" bindinput="onInput" placeholder="如 1000" />
+          <input placeholder-class="input-ph" type="digit" value="{{plateL}}" data-field="plateL" bindinput="onInput" placeholder="如 1000" />
         </view>
         <view class="field">
           <view class="label">板材宽（mm）</view>
-          <input type="digit" value="{{plateW}}" data-field="plateW" bindinput="onInput" placeholder="如 1200" />
+          <input placeholder-class="input-ph" type="digit" value="{{plateW}}" data-field="plateW" bindinput="onInput" placeholder="如 1200" />
         </view>
       </view>
       <view class="form-grid two">
         <view class="field">
           <view class="label">块长（mm）</view>
-          <input type="digit" value="{{blockL}}" data-field="blockL" bindinput="onInput" placeholder="如 90" />
+          <input placeholder-class="input-ph" type="digit" value="{{blockL}}" data-field="blockL" bindinput="onInput" placeholder="如 90" />
         </view>
         <view class="field">
           <view class="label">块宽（mm）</view>
-          <input type="digit" value="{{blockW}}" data-field="blockW" bindinput="onInput" placeholder="如 100" />
+          <input placeholder-class="input-ph" type="digit" value="{{blockW}}" data-field="blockW" bindinput="onInput" placeholder="如 100" />
         </view>
       </view>
       <view class="form-grid two">
         <view class="field">
           <view class="label">板材厚度（mm）</view>
-          <input type="digit" value="{{cutThickness}}" data-field="cutThickness" bindinput="onCutThicknessInput" placeholder="如 20" />
+          <input placeholder-class="input-ph" type="digit" value="{{cutThickness}}" data-field="cutThickness" bindinput="onCutThicknessInput" placeholder="如 20" />
         </view>
         <view class="field">
           <view class="label">刀缝（mm）</view>
-          <input type="digit" value="{{kerf}}" data-field="kerf" bindinput="onInput" placeholder="{{kerfPlaceholder}}" />
+          <input placeholder-class="input-ph" type="digit" value="{{kerf}}" data-field="kerf" bindinput="onInput" placeholder="{{kerfPlaceholder}}" />
         </view>
       </view>
       <view class="form-grid">
         <view class="field" style="flex: 1">
           <view class="label">目标块数（反算用）</view>
-          <input class="{{targetNEdited ? 'edited' : ''}}" type="number" value="{{targetN}}" data-field="targetN" bindinput="onTargetNInput" placeholder="留空按常规测算" />
+          <input placeholder-class="input-ph" class="{{targetNEdited ? 'edited' : ''}}" type="number" value="{{targetN}}" data-field="targetN" bindinput="onTargetNInput" placeholder="留空按常规测算" />
         </view>
       </view>
       <button class="calc-btn" bindtap="onCut">测 算</button>
@@ -60,31 +60,31 @@
       <view class="form-grid two">
         <view class="field">
           <view class="label">材料长度（mm）</view>
-          <input type="digit" value="{{rodLen}}" data-field="rodLen" bindinput="onRodInput" placeholder="如 1000" />
+          <input placeholder-class="input-ph" type="digit" value="{{rodLen}}" data-field="rodLen" bindinput="onRodInput" placeholder="如 1000" />
         </view>
         <view class="field">
           <view class="label">直径（mm）</view>
-          <input type="digit" value="{{rodDia}}" data-field="rodDia" bindinput="onRodDiaInput" placeholder="如 50" />
+          <input placeholder-class="input-ph" type="digit" value="{{rodDia}}" data-field="rodDia" bindinput="onRodDiaInput" placeholder="如 50" />
         </view>
       </view>
       <view class="form-grid two">
         <view class="field">
           <view class="label">单件长度（mm）</view>
-          <input type="digit" value="{{rodPiece}}" data-field="rodPiece" bindinput="onRodInput" placeholder="如 40" />
+          <input placeholder-class="input-ph" type="digit" value="{{rodPiece}}" data-field="rodPiece" bindinput="onRodInput" placeholder="如 40" />
         </view>
         <view class="field">
           <view class="label">夹持长度（mm）</view>
-          <input type="digit" value="{{rodClamp}}" data-field="rodClamp" bindinput="onRodInput" placeholder="{{rodClampPlaceholder}}" />
+          <input placeholder-class="input-ph" type="digit" value="{{rodClamp}}" data-field="rodClamp" bindinput="onRodInput" placeholder="{{rodClampPlaceholder}}" />
         </view>
       </view>
       <view class="form-grid two">
         <view class="field">
           <view class="label">刀缝（mm）</view>
-          <input type="digit" value="{{rodKerf}}" data-field="rodKerf" bindinput="onRodInput" placeholder="{{rodKerfPlaceholder}}" />
+          <input placeholder-class="input-ph" type="digit" value="{{rodKerf}}" data-field="rodKerf" bindinput="onRodInput" placeholder="{{rodKerfPlaceholder}}" />
         </view>
         <view class="field">
           <view class="label">目标件数（反算用）</view>
-          <input class="{{rodTargetNEdited ? 'edited' : ''}}" type="number" value="{{rodTargetN}}" data-field="rodTargetN" bindinput="onRodTargetNInput" placeholder="留空按常规测算" />
+          <input placeholder-class="input-ph" class="{{rodTargetNEdited ? 'edited' : ''}}" type="number" value="{{rodTargetN}}" data-field="rodTargetN" bindinput="onRodTargetNInput" placeholder="留空按常规测算" />
         </view>
       </view>
       <button class="calc-btn" bindtap="onRodCut">测 算</button>
