@@ -57,6 +57,6 @@
 
   <view class="app-footer">
     <view class="slogan">advanced plastics for better life</view>
-    <view class="footer-note">ADV小助手 · 切割测算按刀缝损耗估算，实际以加工为准</view>
+    <view class="footer-note">ADV小助手 · 切割测算按刀缝损耗估算，结果仅供参考，实际以加工及双方确认为准</view>
   </view>
 </view>
