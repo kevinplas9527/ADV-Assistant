@@ -142,7 +142,7 @@ Page({
       // 尺寸齐全：若用户已修改目标重量（橙色），提示留空变量，不覆盖目标值
       if (hasTarget && d.solveWeightEdited) {
         this.setData({
-          solveMsg: "反算需留空一个尺寸（长/宽/厚/直径/长度…）再点计算；或清空单件重量进行常规计算",
+          solveMsg: "⚠ 反算需留空一个尺寸（长/宽/厚/直径/长度…）再点计算；或清空单件重量进行常规计算",
           solveMsgWarn: true
         });
         return;

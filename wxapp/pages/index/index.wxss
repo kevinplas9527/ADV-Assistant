@@ -323,11 +323,13 @@ input,
   line-height: 1.6;
 }
 
-/* 提醒性提示（橙色） */
+/* 提醒性提示（醒目橙色） */
 .solve-msg.warn {
-  background: #fff4e6;
-  border-color: #ffd9a8;
-  color: #f08c00;
+  background: #fff2e0;
+  border: 1.5rpx solid #ffc78f;
+  color: #e8590c;
+  font-size: 28rpx;
+  font-weight: 800;
 }
 
 /* 页脚 */

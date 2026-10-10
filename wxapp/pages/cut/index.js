@@ -239,7 +239,7 @@ Page({
       waste: waste.toLocaleString("zh-CN"),
       canvasHeight: 0,
       cutMsg: msg || (keepMsg ? this.data.cutMsg : ""),
-      cutMsgWarn: !!msg && msg.indexOf("目标块数用于反算") === 0
+      cutMsgWarn: !!msg && msg.indexOf("目标块数用于反算") !== -1
     });
     // 等 canvas 渲染后初始化节点并绘制
     setTimeout(() => this.initCanvasAndDraw(best.blocks, W, H), 120);
@@ -265,7 +265,7 @@ Page({
 
     if (missing === 0) {
       if (hasTarget) {
-        this.runCut(W, H, bw, bh, kerf, "目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸", false);
+        this.runCut(W, H, bw, bh, kerf, "⚠ 目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸", false);
       } else {
         this.setData({ targetNEdited: false });
         this.runCut(W, H, bw, bh, kerf, "", false);

@@ -143,7 +143,7 @@
       if (hasTarget && targetWeight.classList.contains("edited")) {
         solveMsg.classList.remove("hidden");
         solveMsg.classList.add("warn");
-        solveMsg.textContent = "反算需留空一个尺寸（长/宽/厚/直径/长度…）再点计算；或清空单件重量进行常规计算";
+        solveMsg.textContent = "⚠ 反算需留空一个尺寸（长/宽/厚/直径/长度…）再点计算；或清空单件重量进行常规计算";
         return;
       }
       // 常规模式：尺寸齐全 → 计算重量
@@ -581,7 +581,7 @@
     if (msg) {
       cutMsg.classList.remove("hidden");
       cutMsg.textContent = msg;
-      if (msg.indexOf("目标块数用于反算") === 0) {
+      if (msg.indexOf("目标块数用于反算") !== -1) {
         cutMsg.classList.add("warn");
       } else {
         cutMsg.classList.remove("warn");
@@ -612,7 +612,7 @@
 
     if (missing === 0) {
       if (hasTarget) {
-        runCut(W, H, bw, bh, kerf, "目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸");
+        runCut(W, H, bw, bh, kerf, "⚠ 目标块数用于反算：清空板材长或板材宽后点测算，可反算对应尺寸");
       } else {
         cutTargetN.classList.remove("edited");
         runCut(W, H, bw, bh, kerf, "");
