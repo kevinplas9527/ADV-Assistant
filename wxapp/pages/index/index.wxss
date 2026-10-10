@@ -114,7 +114,7 @@ input,
 .picker-value {
   width: 100%;
   padding: 10rpx 14rpx;
-  border: 1rpx solid #dde3ec;
+  border: 1.5rpx solid #c4cedb;
   border-radius: 12rpx;
   font-size: 33rpx;
   background: #fff;
