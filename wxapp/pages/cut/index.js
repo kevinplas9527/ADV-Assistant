@@ -702,5 +702,20 @@ Page({
       ctx.strokeRect(ox + b.x * scale, oy + b.y * scale, b.w * scale, b.h * scale);
     });
     ctx.setLineDash([]);
+  },
+
+  // 意见反馈：打开微信客服会话
+  onFeedbackTap() {
+    wx.openCustomerServiceChat({
+      extInfo: { url: "" },
+      success: () => {},
+      fail: () => {
+        wx.showModal({
+          title: "意见反馈",
+          content: "客服暂未开通。可在小程序后台「功能 → 客服」添加客服微信；或先直接联系 ADV 客服。",
+          showCancel: false
+        });
+      }
+    });
   }
 });

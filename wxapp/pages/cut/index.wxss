@@ -388,3 +388,12 @@
   font-size: 30rpx;
   font-weight: 400;
 }
+
+/* 意见反馈入口（与首页统一） */
+.feedback-link {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: #8f9db3;
+  text-decoration: underline;
+  padding: 8rpx 0 4rpx;
+}

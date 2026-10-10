@@ -175,6 +175,7 @@
 
   <view class="app-footer">
     <view class="slogan">advanced plastics for better life</view>
-    <view class="footer-note">本工具测算结果仅供参考，不构成交货承诺；实际密度、损耗与加工以实测确认为准</view>
+    <view class="footer-note">
+    <view class="feedback-link" bindtap="onFeedbackTap">意见反馈 · 使用建议</view>本工具测算结果仅供参考，不构成交货承诺；实际密度、损耗与加工以实测确认为准</view>
   </view>
 </view>
