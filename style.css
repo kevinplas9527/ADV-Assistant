@@ -330,6 +330,67 @@ body {
   font-weight: 700;
 }
 
+/* 页面导航页签 */
+.app-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.app-tab {
+  flex: 1;
+  padding: 10px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.app-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.app-tab:hover:not(.active) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* 切割测算 */
+.cut-summary {
+  margin-bottom: 14px;
+}
+
+.cut-count {
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.cut-count b {
+  color: var(--primary);
+  font-size: 28px;
+}
+
+.cut-meta {
+  font-size: 12px;
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+.cut-canvas {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfcff;
+}
+
 /* 页脚 */
 .app-footer {
   text-align: center;

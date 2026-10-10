@@ -8,6 +8,15 @@
     </view>
   </view>
 
+  <!-- 功能入口 -->
+  <view class="entry-banner" bindtap="onGoCut">
+    <view class="entry-text">
+      <view class="entry-title">板材切割测算</view>
+      <view class="entry-sub">算最大切割数量 + 切割示意图</view>
+    </view>
+    <view class="entry-arrow">›</view>
+  </view>
+
   <!-- 材料与形态 -->
   <view class="card">
     <view class="card-title">① 材料与形态</view>

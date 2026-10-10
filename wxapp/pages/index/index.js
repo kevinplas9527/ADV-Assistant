@@ -326,5 +326,10 @@ Page({
         wx.showToast({ title: "已复制", icon: "success" });
       }
     });
+  },
+
+  // 跳转板材切割测算
+  onGoCut() {
+    wx.navigateTo({ url: "/pages/cut/index" });
   }
 });

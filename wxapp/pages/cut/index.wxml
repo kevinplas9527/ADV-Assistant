@@ -1,0 +1,57 @@
+<view class="app">
+  <view class="app-header">
+    <image class="logo-img" src="/images/logo.png" mode="aspectFit"></image>
+    <view class="header-text">
+      <view class="title">板材切割测算</view>
+      <view class="subtitle">算最大切割数量 · 线框示意图</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">① 切割参数</view>
+    <view class="form-grid two">
+      <view class="field">
+        <view class="label">板材长（mm）</view>
+        <input type="digit" value="{{plateL}}" data-field="plateL" bindinput="onInput" placeholder="如 1000" />
+      </view>
+      <view class="field">
+        <view class="label">板材宽（mm）</view>
+        <input type="digit" value="{{plateW}}" data-field="plateW" bindinput="onInput" placeholder="如 1200" />
+      </view>
+    </view>
+    <view class="form-grid two">
+      <view class="field">
+        <view class="label">块长（mm）</view>
+        <input type="digit" value="{{blockL}}" data-field="blockL" bindinput="onInput" placeholder="如 90" />
+      </view>
+      <view class="field">
+        <view class="label">块宽（mm）</view>
+        <input type="digit" value="{{blockW}}" data-field="blockW" bindinput="onInput" placeholder="如 100" />
+      </view>
+    </view>
+    <view class="form-grid">
+      <view class="field">
+        <view class="label">刀缝（mm）</view>
+        <input type="digit" value="{{kerf}}" data-field="kerf" bindinput="onInput" placeholder="如 5" />
+      </view>
+    </view>
+    <button class="calc-btn" bindtap="onCut">测 算</button>
+  </view>
+
+  <view class="card" wx:if="{{showResult}}">
+    <view class="card-title">② 测算结果</view>
+    <view class="cut-count">可切 <text class="cut-num">{{count}}</text> 块</view>
+    <view class="cut-meta">排样：{{mode}} ｜ 板材 {{plateL}}×{{plateW}} mm ｜ 单块 {{blockL}}×{{blockW}} mm ｜ 刀缝 {{kerf}} mm</view>
+    <view class="cut-meta">材料利用率 {{ratio}}% ｜ 余料 {{waste}} mm²</view>
+    <view class="cut-legend">
+      <view class="legend-item"><view class="legend-box legend-fwd"></view>正向块</view>
+      <view class="legend-item"><view class="legend-box legend-rot"></view>旋转块</view>
+    </view>
+    <canvas type="2d" id="cutCanvas" class="cut-canvas" style="height:{{canvasHeight}}px"></canvas>
+  </view>
+
+  <view class="app-footer">
+    <view class="slogan">advanced plastics for better life</view>
+    <view class="footer-note">ADV小助手 · 切割测算按刀缝损耗估算，实际以加工为准</view>
+  </view>
+</view>

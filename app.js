@@ -343,4 +343,215 @@
     copyBtn.textContent = "已复制 ✓";
     setTimeout(function () { copyBtn.textContent = "复制结果"; }, 1500);
   }
+
+  // ---------- 页面切换（重量 / 切割） ----------
+  var tabBtns = document.querySelectorAll(".app-tab");
+  var pageWeight = document.getElementById("page-weight");
+  var pageCut = document.getElementById("page-cut");
+
+  tabBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      tabBtns.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      var tab = btn.getAttribute("data-tab");
+      pageWeight.classList.toggle("hidden", tab !== "weight");
+      pageCut.classList.toggle("hidden", tab !== "cut");
+    });
+  });
+
+  // ---------- 板材切割测算 ----------
+  // 沿一个方向排 n 块：n×块 + (n-1)×刀缝 ≤ 板长
+  function cutNum(len, block, kerf) {
+    if (block + kerf <= 0) return 0;
+    return Math.floor((len + kerf) / (block + kerf));
+  }
+
+  // 排样：尝试直排 / 旋转 / 分区混合，取块数最多方案
+  function bestCut(W, H, bw, bh, kerf) {
+    var best = { count: 0, blocks: [], mode: "" };
+
+    function consider(blocks, mode) {
+      if (blocks.length > best.count) {
+        best = { count: blocks.length, blocks: blocks, mode: mode };
+      }
+    }
+
+    // 纯 A（正向直排）
+    (function () {
+      var cols = cutNum(W, bw, kerf), rows = cutNum(H, bh, kerf);
+      if (cols <= 0 || rows <= 0) return;
+      var blocks = [];
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          blocks.push({ x: c * (bw + kerf), y: r * (bh + kerf), w: bw, h: bh, rot: false });
+        }
+      }
+      consider(blocks, "正向直排");
+    })();
+
+    // 纯 B（旋转直排）
+    (function () {
+      var cols = cutNum(W, bh, kerf), rows = cutNum(H, bw, kerf);
+      if (cols <= 0 || rows <= 0) return;
+      var blocks = [];
+      for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+          blocks.push({ x: c * (bh + kerf), y: r * (bw + kerf), w: bh, h: bw, rot: true });
+        }
+      }
+      consider(blocks, "旋转直排");
+    })();
+
+    // 混合1：上方 t 行正向块，下方剩余区域排旋转块
+    (function () {
+      var rowsA = cutNum(H, bh, kerf);
+      for (var t = 1; t <= rowsA; t++) {
+        var hUsed = t * bh + (t - 1) * kerf;
+        var hRem = H - hUsed;
+        if (hRem <= 0) continue;
+        var colsA = cutNum(W, bw, kerf);
+        var colsB = cutNum(W, bh, kerf);
+        var rowsB = cutNum(hRem, bw, kerf);
+        if (colsA <= 0 || colsB <= 0 || rowsB <= 0) continue;
+        var blocks = [];
+        for (var r = 0; r < t; r++) {
+          for (var c = 0; c < colsA; c++) {
+            blocks.push({ x: c * (bw + kerf), y: r * (bh + kerf), w: bw, h: bh, rot: false });
+          }
+        }
+        for (var r2 = 0; r2 < rowsB; r2++) {
+          for (var c2 = 0; c2 < colsB; c2++) {
+            blocks.push({ x: c2 * (bh + kerf), y: hUsed + kerf + r2 * (bw + kerf), w: bh, h: bw, rot: true });
+          }
+        }
+        consider(blocks, "上正下旋分区");
+      }
+    })();
+
+    // 混合2：左方 c 列正向块，右方剩余区域排旋转块
+    (function () {
+      var colsA = cutNum(W, bw, kerf);
+      for (var c = 1; c <= colsA; c++) {
+        var wUsed = c * bw + (c - 1) * kerf;
+        var wRem = W - wUsed;
+        if (wRem <= 0) continue;
+        var rowsA = cutNum(H, bh, kerf);
+        var colsB = cutNum(wRem, bh, kerf);
+        var rowsB = cutNum(H, bw, kerf);
+        if (rowsA <= 0 || colsB <= 0 || rowsB <= 0) continue;
+        var blocks = [];
+        for (var r = 0; r < rowsA; r++) {
+          for (var c0 = 0; c0 < c; c0++) {
+            blocks.push({ x: c0 * (bw + kerf), y: r * (bh + kerf), w: bw, h: bh, rot: false });
+          }
+        }
+        for (var r2 = 0; r2 < rowsB; r2++) {
+          for (var c2 = 0; c2 < colsB; c2++) {
+            blocks.push({ x: wUsed + kerf + c2 * (bh + kerf), y: r2 * (bw + kerf), w: bh, h: bw, rot: true });
+          }
+        }
+        consider(blocks, "左正右旋分区");
+      }
+    })();
+
+    // 混合3：上方 t 行旋转块，下方剩余区域排正向块
+    (function () {
+      var rowsB = cutNum(H, bw, kerf);
+      for (var t = 1; t <= rowsB; t++) {
+        var hUsed = t * bw + (t - 1) * kerf;
+        var hRem = H - hUsed;
+        if (hRem <= 0) continue;
+        var colsB = cutNum(W, bh, kerf);
+        var colsA = cutNum(W, bw, kerf);
+        var rowsA = cutNum(hRem, bh, kerf);
+        if (colsB <= 0 || colsA <= 0 || rowsA <= 0) continue;
+        var blocks = [];
+        for (var r = 0; r < t; r++) {
+          for (var c = 0; c < colsB; c++) {
+            blocks.push({ x: c * (bh + kerf), y: r * (bw + kerf), w: bh, h: bw, rot: true });
+          }
+        }
+        for (var r2 = 0; r2 < rowsA; r2++) {
+          for (var c2 = 0; c2 < colsA; c2++) {
+            blocks.push({ x: c2 * (bw + kerf), y: hUsed + kerf + r2 * (bh + kerf), w: bw, h: bh, rot: false });
+          }
+        }
+        consider(blocks, "上旋下正分区");
+      }
+    })();
+
+    return best;
+  }
+
+  // 绘制切割示意图（线框）
+  function drawCutCanvas(blocks, W, H) {
+    var canvas = document.getElementById("cut-canvas");
+    var dpr = window.devicePixelRatio || 1;
+    var baseW = 560;
+    var baseH = Math.max(280, Math.round(baseW * H / W));
+    canvas.width = baseW * dpr;
+    canvas.height = baseH * dpr;
+    canvas.style.aspectRatio = baseW + " / " + baseH;
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, baseW, baseH);
+    var pad = 24;
+    var scale = Math.min((baseW - pad * 2) / W, (baseH - pad * 2) / H);
+    var ox = (baseW - W * scale) / 2;
+    var oy = (baseH - H * scale) / 2;
+
+    // 板材外框
+    ctx.strokeStyle = "#1e5eff";
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(ox, oy, W * scale, H * scale);
+    // 切割线（刀缝线用浅色虚线）
+    ctx.beginPath();
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = "#b9c6ea";
+    ctx.lineWidth = 1;
+    for (var i = 1; i < Math.round(W / 100); i++) { /* 占位：不画外部网格 */ }
+    // 每个块
+    blocks.forEach(function (b) {
+      ctx.strokeStyle = b.rot ? "#f08c00" : "#3a66d8";
+      ctx.lineWidth = 1.3;
+      ctx.setLineDash([]);
+      ctx.strokeRect(ox + b.x * scale, oy + b.y * scale, b.w * scale, b.h * scale);
+    });
+    // 旋转块用虚线区分
+    ctx.setLineDash([]);
+  }
+
+  var cutBtn = document.getElementById("cut-btn");
+  cutBtn.addEventListener("click", function () {
+    var W = num("cut-plate-l");
+    var H = num("cut-plate-w");
+    var bw = num("cut-block-l");
+    var bh = num("cut-block-w");
+    var kerf = parseFloat(document.getElementById("cut-kerf").value);
+    if (!isFinite(kerf)) kerf = 0;
+    if (kerf < 0) kerf = 0;
+
+    if (W === null || H === null || bw === null || bh === null) {
+      alert("请完整填写板材尺寸、块尺寸和刀缝（mm）");
+      return;
+    }
+    if (bw > W && bh > W && bw > H && bh > H) {
+      alert("块尺寸大于板材，无法切割");
+      return;
+    }
+
+    var best = bestCut(W, H, bw, bh, kerf);
+    if (best.count === 0) {
+      alert("无法放下任何一块，请检查尺寸");
+      return;
+    }
+
+    var areaRatio = (best.count * bw * bh) / (W * H);
+    document.getElementById("cut-summary").innerHTML =
+      "<div class='cut-count'>可切 <b>" + best.count + "</b> 块</div>" +
+      "<div class='cut-meta'>排样：" + best.mode + " ｜ 板材 " + W + "×" + H + " mm ｜ 单块 " + bw + "×" + bh + " mm ｜ 刀缝 " + kerf + " mm</div>" +
+      "<div class='cut-meta'>材料利用率 " + (areaRatio * 100).toFixed(1) + "% ｜ 余料 " + formatNum(W * H - best.count * bw * bh) + " mm²</div>";
+    document.getElementById("cut-result-card").classList.remove("hidden");
+    drawCutCanvas(best.blocks, W, H);
+  });
 })();
