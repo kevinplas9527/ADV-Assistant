@@ -94,6 +94,14 @@ Page({
     voiceTip: ""
   },
 
+  // 开启分享：右上角菜单「转发」可用
+  onShareAppMessage() {
+    return {
+      title: "ADV小助手 · 工程塑料重量测算",
+      path: "/pages/index/index"
+    };
+  },
+
   onLoad() {
     if (!voicePlugin) return;
     this.voiceManager = voicePlugin.getRecordRecognitionManager();

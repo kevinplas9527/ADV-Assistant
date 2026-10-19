@@ -77,6 +77,14 @@ Page({
     voiceTip: ""
   },
 
+  // 开启分享：右上角菜单「转发」可用
+  onShareAppMessage() {
+    return {
+      title: "ADV小助手 · 板棒材切割测算",
+      path: "/pages/cut/index"
+    };
+  },
+
   onLoad() {
     if (!voicePlugin) return;
     this.voiceManager = voicePlugin.getRecordRecognitionManager();
