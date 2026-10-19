@@ -98,7 +98,8 @@ Page({
   onShareAppMessage() {
     return {
       title: "ADV小助手 · 工程塑料重量测算",
-      path: "/pages/index/index"
+      path: "/pages/index/index",
+      imageUrl: "/images/share-cover.png"
     };
   },
 

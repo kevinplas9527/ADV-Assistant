@@ -81,7 +81,8 @@ Page({
   onShareAppMessage() {
     return {
       title: "ADV小助手 · 板棒材切割测算",
-      path: "/pages/cut/index"
+      path: "/pages/cut/index",
+      imageUrl: "/images/share-cover.png"
     };
   },
 
