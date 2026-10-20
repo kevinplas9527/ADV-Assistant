@@ -389,13 +389,23 @@
   font-weight: 400;
 }
 
-/* 意见反馈入口（与首页统一） */
-.feedback-link {
+/* 意见反馈入口（与首页统一，原生客服按钮） */
+.feedback-btn {
   margin-top: 24rpx;
   font-size: 24rpx;
   color: #8f9db3;
   text-decoration: underline;
   padding: 8rpx 0 4rpx;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  line-height: 1.6;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+.feedback-btn::after {
+  border: none;
 }
 
 /* 版权行（与首页统一） */
