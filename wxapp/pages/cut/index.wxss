@@ -402,7 +402,7 @@
   line-height: 1.6;
   display: block;
   width: 100%;
-  text-align: left;
+  text-align: center;
 }
 .feedback-btn::after {
   border: none;
