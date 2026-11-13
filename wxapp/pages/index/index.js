@@ -71,6 +71,7 @@ Page({
     materialIndex: 0,
     materialName: "PTFE 聚四氟乙烯",
     density: "2.20",
+    densityEdited: false,
     shape: "plate",
     tubeMode: "od-id",
     plateL: "",
@@ -224,6 +225,7 @@ Page({
   },
 
   // ---------- 材料记忆与自定义材料库（本机存储） ----------
+  // 按材料分别记忆用户改过的密度 { 材料名: "密度" }，关掉小程序后依然保留
   restoreMaterialPref() {
     let pref = null;
     try {
@@ -231,7 +233,18 @@ Page({
     } catch (e) {
       pref = null;
     }
+    this._densityMap = {};
     if (!pref || typeof pref !== "object") return;
+    const savedMap = pref.densityMap && typeof pref.densityMap === "object" ? pref.densityMap : {};
+    Object.keys(savedMap).forEach((k) => {
+      const d = parseFloat(savedMap[k]);
+      if (isFinite(d) && d > 0) this._densityMap[k] = String(savedMap[k]);
+    });
+    // 兼容旧版只存"最后一次密度"的格式
+    if (pref.name && pref.density && this._densityMap[pref.name] === undefined) {
+      const d = parseFloat(pref.density);
+      if (isFinite(d) && d > 0) this._densityMap[pref.name] = String(pref.density);
+    }
     const custom = Array.isArray(pref.custom)
       ? pref.custom.filter(function (m) { return m && m.name && isFinite(parseFloat(m.density)); })
       : [];
@@ -242,13 +255,14 @@ Page({
     }
     if (idx < 0) idx = 0;
     const m = list[idx];
-    const den = parseFloat(pref.density);
+    const saved = this._densityMap[m.name];
     this.setData({
       materials: list,
       customMaterials: custom,
       materialIndex: idx,
       materialName: m.name,
-      density: isFinite(den) && den > 0 ? String(den) : String(m.density)
+      density: saved !== undefined ? saved : String(m.density),
+      densityEdited: saved !== undefined && Math.abs(parseFloat(saved) - m.density) > 0.0001
     });
   },
 
@@ -256,7 +270,7 @@ Page({
     try {
       wx.setStorageSync(MAT_PREF_KEY, {
         name: this.data.materialName,
-        density: this.data.density,
+        densityMap: this._densityMap || {},
         custom: this.data.customMaterials
       });
     } catch (e) {
@@ -268,12 +282,35 @@ Page({
     const i = Number(e.detail.value);
     const m = this.data.materials[i];
     if (!m) return;
-    this.setData({ materialIndex: i, materialName: m.name, density: String(m.density) });
+    const saved = this._densityMap ? this._densityMap[m.name] : undefined;
+    this.setData({
+      materialIndex: i,
+      materialName: m.name,
+      density: saved !== undefined ? saved : String(m.density),
+      densityEdited: saved !== undefined && Math.abs(parseFloat(saved) - m.density) > 0.0001
+    });
     this.saveMaterialPref();
   },
 
   onDensityInput(e) {
-    this.setData({ density: e.detail.value });
+    const v = e.detail.value;
+    const name = this.data.materialName;
+    if (!this._densityMap) this._densityMap = {};
+    if (String(v).trim() === "") {
+      delete this._densityMap[name];
+    } else {
+      this._densityMap[name] = v;
+    }
+    const d = parseFloat(v);
+    let def = 0;
+    const list = this.data.materials;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].name === name) { def = list[i].density; break; }
+    }
+    this.setData({
+      density: v,
+      densityEdited: isFinite(d) && d > 0 && Math.abs(d - def) > 0.0001
+    });
     clearTimeout(this._prefTimer);
     this._prefTimer = setTimeout(() => this.saveMaterialPref(), 400);
   },
@@ -306,12 +343,15 @@ Page({
     for (let i = 0; i < merged.length; i++) {
       if (merged[i].name === name) { idx = i; break; }
     }
+    if (!this._densityMap) this._densityMap = {};
+    this._densityMap[name] = String(den);
     this.setData({
       customMaterials: custom,
       materials: merged,
       materialIndex: idx,
       materialName: name,
       density: String(den),
+      densityEdited: false,
       newMatName: "",
       newMatDensity: "",
       showCustomPanel: false
@@ -324,21 +364,23 @@ Page({
     const i = Number(e.currentTarget.dataset.index);
     const custom = this.data.customMaterials.slice();
     const removed = custom.splice(i, 1)[0];
+    if (removed && this._densityMap) delete this._densityMap[removed.name];
     const merged = MATERIALS.concat(custom);
-    const patch = { customMaterials: custom, materials: merged };
     let idx = -1;
-    if (!removed || this.data.materialName !== removed.name) {
-      for (let k = 0; k < merged.length; k++) {
-        if (merged[k].name === this.data.materialName) { idx = k; break; }
-      }
+    for (let k = 0; k < merged.length; k++) {
+      if (merged[k].name === this.data.materialName) { idx = k; break; }
     }
-    if (idx < 0) {
-      idx = 0;
-      patch.materialName = MATERIALS[0].name;
-      patch.density = String(MATERIALS[0].density);
-    }
-    patch.materialIndex = idx;
-    this.setData(patch);
+    if (idx < 0) idx = 0;
+    const m = merged[idx];
+    const saved = this._densityMap ? this._densityMap[m.name] : undefined;
+    this.setData({
+      customMaterials: custom,
+      materials: merged,
+      materialIndex: idx,
+      materialName: m.name,
+      density: saved !== undefined ? saved : String(m.density),
+      densityEdited: saved !== undefined && Math.abs(parseFloat(saved) - m.density) > 0.0001
+    });
     this.saveMaterialPref();
     wx.showToast({ title: "已删除", icon: "none" });
   },

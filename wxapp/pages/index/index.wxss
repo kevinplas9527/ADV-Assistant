@@ -211,6 +211,11 @@ input,
 }
 
 /* 材料记忆 / 自定义材料库 */
+.den-mark {
+  font-size: 22rpx;
+  color: #1e5eff;
+  margin-left: 4rpx;
+}
 .mat-bar {
   display: flex;
   justify-content: flex-end;

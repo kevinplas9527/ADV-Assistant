@@ -40,7 +40,7 @@
         </picker>
       </view>
       <view class="field">
-        <view class="label">密度（g/cm³）</view>
+        <view class="label">密度（g/cm³）<text class="den-mark" wx:if="{{densityEdited}}">· 已调整</text></view>
         <input placeholder-class="input-ph" type="digit" value="{{density}}" bindinput="onDensityInput" placeholder="2.20" />
       </view>
     </view>
