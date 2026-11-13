@@ -1,11 +1,16 @@
 const { parseVoice } = require("../../utils/voice.js");
 
-// 语音识别插件（同声传译 WechatSI）；插件未就绪时降级提示
-let voicePlugin = null;
-try {
-  voicePlugin = requirePlugin("WechatSI");
-} catch (e) {
-  voicePlugin = null;
+// 语音识别插件（同声传译 WechatSI）：懒加载，不在启动时拉取，避免拖慢冷启动
+// undefined = 还没尝试加载；null = 加载失败；对象 = 就绪
+let voicePlugin;
+function loadVoicePlugin() {
+  if (voicePlugin !== undefined) return voicePlugin;
+  try {
+    voicePlugin = requirePlugin("WechatSI");
+  } catch (e) {
+    voicePlugin = null;
+  }
+  return voicePlugin;
 }
 
 // 按当前切割模式生成字段映射（长关键词在前，避免短关键词误捕）
@@ -100,29 +105,39 @@ Page({
     return {
       title: "ADV小助手 · 板棒材切割测算",
       path: "/pages/cut/index",
-      imageUrl: "/images/share-cover.png"
+      imageUrl: "/images/share-cover.jpg"
     };
   },
 
   onLoad() {
-    if (!voicePlugin) return;
-    this.voiceManager = voicePlugin.getRecordRecognitionManager();
-    this.voiceManager.onStart = () => {
+    // 首屏先出来，语音插件等空闲时再预热，不占启动时间
+    setTimeout(() => this.initVoiceManager(), 600);
+  },
+
+  initVoiceManager() {
+    if (this.voiceManager) return this.voiceManager;
+    const plugin = loadVoicePlugin();
+    if (!plugin) return null;
+    const m = plugin.getRecordRecognitionManager();
+    m.onStart = () => {
       this.setData({ voiceState: "rec", voiceText: "", voiceTip: "" });
     };
-    this.voiceManager.onRecognize = (res) => {
+    m.onRecognize = (res) => {
       this.setData({ voiceText: res.result || "" });
     };
-    this.voiceManager.onStop = (res) => {
+    m.onStop = (res) => {
       this.handleVoiceResult((res && res.result) || "");
     };
-    this.voiceManager.onError = (res) => {
+    m.onError = (res) => {
       this.setData({ voiceState: "idle", voiceTip: "语音识别失败：" + ((res && res.msg) || "请重试") });
     };
+    this.voiceManager = m;
+    return m;
   },
 
   // 语音输入：点击开始/停止（全链路异常兜底，任何问题都会可见提示）
   onVoiceTap() {
+    if (!this.voiceManager) this.initVoiceManager();
     if (!this.voiceManager) {
       wx.showToast({ title: "语音插件未就绪，请检查插件是否添加", icon: "none", duration: 2500 });
       return;
@@ -137,7 +152,6 @@ Page({
           this.voiceManager.start({ duration: 30000, lang: "zh_CN" });
           // 立即给出录音态反馈，不等插件回调
           this.setData({ voiceState: "rec", voiceText: "", voiceTip: "" });
-          console.log("[voice] start ok");
         } catch (err) {
           console.error("[voice] start error", err);
           wx.showToast({ title: "录音启动失败：" + (err && err.errMsg ? err.errMsg : "未知错误"), icon: "none", duration: 3000 });
@@ -145,7 +159,6 @@ Page({
       };
       wx.getSetting({
         success: (r) => {
-          console.log("[voice] authSetting", JSON.stringify(r.authSetting));
           if (r.authSetting["scope.record"] === false) {
             wx.showModal({
               title: "需要麦克风权限",
