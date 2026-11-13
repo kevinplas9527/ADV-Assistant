@@ -227,6 +227,15 @@ input,
   text-decoration: underline;
   padding: 4rpx 0;
 }
+
+/* 恢复默认：左侧靠左，右侧「＋ 我的材料」仍贴右 */
+.mat-reset {
+  margin-right: auto;
+  font-size: 24rpx;
+  color: #8f9db3;
+  text-decoration: underline;
+  padding: 4rpx 0;
+}
 .mat-panel {
   border: 1rpx dashed #dde3ec;
   border-radius: 14rpx;

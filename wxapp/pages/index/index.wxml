@@ -47,6 +47,7 @@
 
     <!-- 材料记忆 / 自定义材料库 -->
     <view class="mat-bar">
+      <view class="mat-reset" wx:if="{{densityEdited}}" bindtap="onResetDensity">恢复默认 {{defaultDensity}}</view>
       <view class="mat-link" bindtap="onToggleCustomPanel">{{showCustomPanel ? '收起材料库' : '＋ 我的材料（自定义密度）'}}</view>
     </view>
     <view class="mat-panel" wx:if="{{showCustomPanel}}">

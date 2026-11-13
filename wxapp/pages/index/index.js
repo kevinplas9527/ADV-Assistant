@@ -20,6 +20,12 @@ const MATERIALS = [
   { name: "PVC 硬质聚氯乙烯", density: 1.45 }
 ];
 
+// 密度统一按两位小数显示（2.2 -> 2.20），避免「恢复默认」后少一位零
+function fmtDen(v) {
+  const n = parseFloat(v);
+  return isFinite(n) ? n.toFixed(2) : String(v);
+}
+
 // 本机记忆：上次选中的材料/手改密度 + 自定义材料库
 const MAT_PREF_KEY = "adv_mat_pref_v1";
 
@@ -76,6 +82,7 @@ Page({
     materialIndex: 0,
     materialName: "PTFE 聚四氟乙烯",
     density: "2.20",
+    defaultDensity: "2.20",
     densityEdited: false,
     shape: "plate",
     tubeMode: "od-id",
@@ -273,7 +280,8 @@ Page({
     const patch = {
       materialIndex: idx,
       materialName: m.name,
-      density: saved !== undefined ? saved : String(m.density),
+      density: saved !== undefined ? saved : fmtDen(m.density),
+      defaultDensity: fmtDen(m.density),
       densityEdited: saved !== undefined && Math.abs(parseFloat(saved) - m.density) > 0.0001
     };
     if (custom.length) {
@@ -303,7 +311,8 @@ Page({
     this.setData({
       materialIndex: i,
       materialName: m.name,
-      density: saved !== undefined ? saved : String(m.density),
+      density: saved !== undefined ? saved : fmtDen(m.density),
+      defaultDensity: fmtDen(m.density),
       densityEdited: saved !== undefined && Math.abs(parseFloat(saved) - m.density) > 0.0001
     });
     this.saveMaterialPref();
@@ -330,6 +339,24 @@ Page({
     });
     clearTimeout(this._prefTimer);
     this._prefTimer = setTimeout(() => this.saveMaterialPref(), 400);
+  },
+
+  // 恢复厂家默认密度：删掉本机这条记录，数值回默认，「恢复默认」按钮与「· 已调整」一起消失
+  onResetDensity() {
+    const name = this.data.materialName;
+    if (this._densityMap) delete this._densityMap[name];
+    let def = 0;
+    const list = this.data.materials;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].name === name) { def = list[i].density; break; }
+    }
+    clearTimeout(this._prefTimer);
+    this.setData({
+      density: fmtDen(def),
+      defaultDensity: fmtDen(def),
+      densityEdited: false
+    });
+    this.saveMaterialPref();
   },
 
   onToggleCustomPanel() {
@@ -367,7 +394,8 @@ Page({
       materials: merged,
       materialIndex: idx,
       materialName: name,
-      density: String(den),
+      density: fmtDen(den),
+      defaultDensity: fmtDen(den),
       densityEdited: false,
       newMatName: "",
       newMatDensity: "",
@@ -395,7 +423,8 @@ Page({
       materials: merged,
       materialIndex: idx,
       materialName: m.name,
-      density: saved !== undefined ? saved : String(m.density),
+      density: saved !== undefined ? saved : fmtDen(m.density),
+      defaultDensity: fmtDen(m.density),
       densityEdited: saved !== undefined && Math.abs(parseFloat(saved) - m.density) > 0.0001
     });
     this.saveMaterialPref();
