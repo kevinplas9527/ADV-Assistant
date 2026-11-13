@@ -621,6 +621,7 @@ Page({
       canvasHeight: 0
     });
     setTimeout(() => this.initMixCanvasAndDraw(sheets, W, H), 120);
+    setTimeout(() => this.scrollToResult("#resultCard"), 620);
   },
 
   initMixCanvasAndDraw(sheets, W, H) {
@@ -769,6 +770,7 @@ Page({
     });
     // 等 canvas 渲染后初始化节点并绘制
     setTimeout(() => this.initCanvasAndDraw(best.blocks, W, H), 120);
+    setTimeout(() => this.scrollToResult("#resultCard"), 620);
   },
 
   onCut() {
@@ -890,6 +892,7 @@ Page({
       rodTargetShow: targetText || ""
     });
     setTimeout(() => this.initRodCanvasAndDraw(n, L, p, clamp, k), 120);
+    setTimeout(() => this.scrollToResult("#resultCard"), 620);
   },
 
   initRodCanvasAndDraw(n, L, p, clamp, k) {
@@ -1064,6 +1067,7 @@ Page({
       rodCanvasHeight: 0
     });
     setTimeout(() => this.initRodMixCanvasAndDraw(bars, L, clamp, k), 120);
+    setTimeout(() => this.scrollToResult("#resultCard"), 620);
   },
 
   initRodMixCanvasAndDraw(bars, L, clamp, k) {
@@ -1162,6 +1166,18 @@ Page({
       ctx.font = "11px sans-serif";
       ctx.fillText("仅显示前 " + MAX_BARS + " 根，共 " + bars.length + " 根", 8, cssH - 4);
     }
+  },
+
+  // 结果生成后平滑滚动到结果区，免去用户手动下拉
+  scrollToResult(sel) {
+    const q = wx.createSelectorQuery();
+    q.select(sel).boundingClientRect();
+    q.selectViewport().scrollOffset();
+    q.exec((res) => {
+      if (!res || !res[0] || !res[1]) return;
+      const top = Math.max(0, res[0].top + res[1].scrollTop - 10);
+      wx.pageScrollTo({ scrollTop: top, duration: 400 });
+    });
   },
 
   onRodCut() {

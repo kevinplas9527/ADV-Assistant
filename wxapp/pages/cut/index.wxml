@@ -130,7 +130,7 @@
     </block>
   </view>
 
-  <view class="card" wx:if="{{showResult || showRodResult}}">
+  <view class="card result-in" id="resultCard" wx:if="{{showResult || showRodResult}}">
     <view class="card-title">② 测算结果</view>
 
     <!-- 板材结果 -->

@@ -574,6 +574,20 @@ Page({
       patch.solveMsgWarn = false;
     }
     this.setData(patch);
+    // 结果生成后平滑滚动到结果区，免去用户手动下拉
+    setTimeout(() => this.scrollToResult("#resultBody"), 260);
+  },
+
+  // 结果生成后平滑滚动到结果区
+  scrollToResult(sel) {
+    const q = wx.createSelectorQuery();
+    q.select(sel).boundingClientRect();
+    q.selectViewport().scrollOffset();
+    q.exec((res) => {
+      if (!res || !res[0] || !res[1]) return;
+      const top = Math.max(0, res[0].top + res[1].scrollTop - 10);
+      wx.pageScrollTo({ scrollTop: top, duration: 400 });
+    });
   },
 
   // 反算：按目标重量解出留空的变量
