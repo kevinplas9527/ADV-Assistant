@@ -20,6 +20,9 @@ const MATERIALS = [
   { name: "PVC 硬质聚氯乙烯", density: 1.45 }
 ];
 
+// 本机记忆：上次选中的材料/手改密度 + 自定义材料库
+const MAT_PREF_KEY = "adv_mat_pref_v1";
+
 // 语音识别插件（同声传译 WechatSI）；插件未就绪时降级提示
 let voicePlugin = null;
 try {
@@ -61,6 +64,10 @@ Page({
   data: {
     activeTab: "weight",
     materials: MATERIALS,
+    customMaterials: [],
+    showCustomPanel: false,
+    newMatName: "",
+    newMatDensity: "",
     materialIndex: 0,
     materialName: "PTFE 聚四氟乙烯",
     density: "2.20",
@@ -104,6 +111,7 @@ Page({
   },
 
   onLoad() {
+    this.restoreMaterialPref();
     if (!voicePlugin) return;
     this.voiceManager = voicePlugin.getRecordRecognitionManager();
     this.voiceManager.onStart = () => {
@@ -118,6 +126,17 @@ Page({
     this.voiceManager.onError = (res) => {
       this.setData({ voiceState: "idle", voiceTip: "语音识别失败：" + ((res && res.msg) || "请重试") });
     };
+  },
+
+  // 离开页面时把未落盘的密度改动立即保存（防抖计时器可能未触发）
+  onHide() {
+    clearTimeout(this._prefTimer);
+    this.saveMaterialPref();
+  },
+
+  onUnload() {
+    clearTimeout(this._prefTimer);
+    this.saveMaterialPref();
   },
 
   // 语音输入：点击开始/停止（全链路异常兜底，任何问题都会可见提示）
@@ -204,14 +223,124 @@ Page({
     }, 3000);
   },
 
+  // ---------- 材料记忆与自定义材料库（本机存储） ----------
+  restoreMaterialPref() {
+    let pref = null;
+    try {
+      pref = wx.getStorageSync(MAT_PREF_KEY);
+    } catch (e) {
+      pref = null;
+    }
+    if (!pref || typeof pref !== "object") return;
+    const custom = Array.isArray(pref.custom)
+      ? pref.custom.filter(function (m) { return m && m.name && isFinite(parseFloat(m.density)); })
+      : [];
+    const list = MATERIALS.concat(custom);
+    let idx = -1;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].name === pref.name) { idx = i; break; }
+    }
+    if (idx < 0) idx = 0;
+    const m = list[idx];
+    const den = parseFloat(pref.density);
+    this.setData({
+      materials: list,
+      customMaterials: custom,
+      materialIndex: idx,
+      materialName: m.name,
+      density: isFinite(den) && den > 0 ? String(den) : String(m.density)
+    });
+  },
+
+  saveMaterialPref() {
+    try {
+      wx.setStorageSync(MAT_PREF_KEY, {
+        name: this.data.materialName,
+        density: this.data.density,
+        custom: this.data.customMaterials
+      });
+    } catch (e) {
+      console.warn("[mat] save pref fail", e);
+    }
+  },
+
   onMaterialChange(e) {
     const i = Number(e.detail.value);
-    const m = MATERIALS[i];
+    const m = this.data.materials[i];
+    if (!m) return;
     this.setData({ materialIndex: i, materialName: m.name, density: String(m.density) });
+    this.saveMaterialPref();
   },
 
   onDensityInput(e) {
     this.setData({ density: e.detail.value });
+    clearTimeout(this._prefTimer);
+    this._prefTimer = setTimeout(() => this.saveMaterialPref(), 400);
+  },
+
+  onToggleCustomPanel() {
+    this.setData({ showCustomPanel: !this.data.showCustomPanel });
+  },
+
+  onSaveCustom() {
+    const name = String(this.data.newMatName || "").trim();
+    const den = parseFloat(this.data.newMatDensity);
+    if (!name) {
+      wx.showToast({ title: "请先填写材料名称", icon: "none" });
+      return;
+    }
+    if (!isFinite(den) || den <= 0 || den > 20) {
+      wx.showToast({ title: "密度请填 0~20 之间", icon: "none" });
+      return;
+    }
+    const all = MATERIALS.concat(this.data.customMaterials);
+    for (let i = 0; i < all.length; i++) {
+      if (all[i].name === name) {
+        wx.showToast({ title: "已有同名材料", icon: "none" });
+        return;
+      }
+    }
+    const custom = this.data.customMaterials.concat([{ name: name, density: den }]);
+    const merged = MATERIALS.concat(custom);
+    let idx = 0;
+    for (let i = 0; i < merged.length; i++) {
+      if (merged[i].name === name) { idx = i; break; }
+    }
+    this.setData({
+      customMaterials: custom,
+      materials: merged,
+      materialIndex: idx,
+      materialName: name,
+      density: String(den),
+      newMatName: "",
+      newMatDensity: "",
+      showCustomPanel: false
+    });
+    this.saveMaterialPref();
+    wx.showToast({ title: "已保存并选中", icon: "none" });
+  },
+
+  onDeleteCustom(e) {
+    const i = Number(e.currentTarget.dataset.index);
+    const custom = this.data.customMaterials.slice();
+    const removed = custom.splice(i, 1)[0];
+    const merged = MATERIALS.concat(custom);
+    const patch = { customMaterials: custom, materials: merged };
+    let idx = -1;
+    if (!removed || this.data.materialName !== removed.name) {
+      for (let k = 0; k < merged.length; k++) {
+        if (merged[k].name === this.data.materialName) { idx = k; break; }
+      }
+    }
+    if (idx < 0) {
+      idx = 0;
+      patch.materialName = MATERIALS[0].name;
+      patch.density = String(MATERIALS[0].density);
+    }
+    patch.materialIndex = idx;
+    this.setData(patch);
+    this.saveMaterialPref();
+    wx.showToast({ title: "已删除", icon: "none" });
   },
 
   onShapeTap(e) {

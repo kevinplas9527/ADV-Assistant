@@ -45,6 +45,31 @@
       </view>
     </view>
 
+    <!-- 材料记忆 / 自定义材料库 -->
+    <view class="mat-bar">
+      <view class="mat-link" bindtap="onToggleCustomPanel">{{showCustomPanel ? '收起材料库' : '＋ 我的材料（自定义密度）'}}</view>
+    </view>
+    <view class="mat-panel" wx:if="{{showCustomPanel}}">
+      <view class="mat-tip">自定义材料保存在本机，下次打开自动恢复；选中后密度自动填入</view>
+      <view class="mat-item" wx:for="{{customMaterials}}" wx:key="name">
+        <view class="mat-name">{{item.name}}</view>
+        <view class="mat-den">{{item.density}} g/cm³</view>
+        <view class="mat-del" data-index="{{index}}" catchtap="onDeleteCustom">删除</view>
+      </view>
+      <view class="mat-empty" wx:if="{{customMaterials.length === 0}}">还没有自定义材料</view>
+      <view class="mat-add">
+        <view class="field" style="flex: 1.7">
+          <view class="label">材料名称</view>
+          <input placeholder-class="input-ph" type="text" value="{{newMatName}}" data-field="newMatName" bindinput="onInput" placeholder="如 PTFE+15%GF" />
+        </view>
+        <view class="field" style="flex: 1">
+          <view class="label">密度</view>
+          <input placeholder-class="input-ph" type="digit" value="{{newMatDensity}}" data-field="newMatDensity" bindinput="onInput" placeholder="如 2.35" />
+        </view>
+        <view class="mat-save" bindtap="onSaveCustom">保存</view>
+      </view>
+    </view>
+
     <view class="shape-tabs">
       <view class="shape-btn {{shape === 'plate' ? 'active' : ''}}" data-shape="plate" bindtap="onShapeTap">
         <image class="shape-icon" src="/images/icon-plate.png" mode="aspectFit"></image>
