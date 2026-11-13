@@ -34,11 +34,11 @@
       <view class="form-grid two">
         <view class="field">
           <view class="label">板材长（mm）</view>
-          <input placeholder-class="input-ph" type="digit" value="{{plateL}}" data-field="plateL" bindinput="onInput" placeholder="如 1000" />
+          <input placeholder-class="input-ph" type="digit" value="{{plateL}}" data-field="plateL" bindinput="onInput" placeholder="如 1200" />
         </view>
         <view class="field">
           <view class="label">板材宽（mm）</view>
-          <input placeholder-class="input-ph" type="digit" value="{{plateW}}" data-field="plateW" bindinput="onInput" placeholder="如 1200" />
+          <input placeholder-class="input-ph" type="digit" value="{{plateW}}" data-field="plateW" bindinput="onInput" placeholder="如 1000" />
         </view>
       </view>
       <view class="form-grid two">
@@ -65,8 +65,8 @@
       </view>
       <view class="spec-row" wx:for="{{blockSpecs}}" wx:key="id">
         <view class="spec-tag" style="color:{{index === 0 ? '#1e5eff' : index === 1 ? '#f08c00' : index === 2 ? '#2f9e44' : index === 3 ? '#7048e8' : '#c92a2a'}}">{{index + 1}}</view>
-        <input class="spec-in" placeholder-class="input-ph" type="digit" value="{{item.l}}" data-index="{{index}}" data-key="l" bindinput="onBlockSpecInput" placeholder="长 如 90" />
-        <input class="spec-in" placeholder-class="input-ph" type="digit" value="{{item.w}}" data-index="{{index}}" data-key="w" bindinput="onBlockSpecInput" placeholder="宽 如 100" />
+        <input class="spec-in" placeholder-class="input-ph" type="digit" value="{{item.l}}" data-index="{{index}}" data-key="l" bindinput="onBlockSpecInput" placeholder="长 如 100" />
+        <input class="spec-in" placeholder-class="input-ph" type="digit" value="{{item.w}}" data-index="{{index}}" data-key="w" bindinput="onBlockSpecInput" placeholder="宽 如 90" />
         <input class="spec-in spec-qty" placeholder-class="input-ph" type="number" value="{{item.qty}}" data-index="{{index}}" data-key="qty" bindinput="onBlockSpecInput" placeholder="数量" />
         <view class="spec-del" wx:if="{{blockSpecs.length > 1}}" data-index="{{index}}" catchtap="onDelBlockSpec">×</view>
       </view>
