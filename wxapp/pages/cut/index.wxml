@@ -147,6 +147,11 @@
             <view class="legend-box" style="background:{{item.color}}"></view>{{item.label}}（{{item.count}} 块）
           </view>
         </view>
+        <view class="mix-pager" wx:if="{{mixTotal > 1}}">
+          <view class="pg-btn {{mixPage <= 1 ? 'dis' : ''}}" bindtap="onMixPrev">‹</view>
+          <view class="pg-text">板 {{mixPage}} / {{mixTotal}}</view>
+          <view class="pg-btn {{mixPage >= mixTotal ? 'dis' : ''}}" bindtap="onMixNext">›</view>
+        </view>
       </block>
       <block wx:else>
         <view class="cut-count">可切 <text class="cut-num">{{count}}</text> 块<text class="cut-target" wx:if="{{targetShow}}">{{targetShow}}</text></view>
@@ -173,6 +178,11 @@
           <view class="legend-item" wx:for="{{legendRodSpecs}}" wx:key="label">
             <view class="legend-box" style="background:{{item.color}}"></view>{{item.label}}（{{item.count}} 段）
           </view>
+        </view>
+        <view class="mix-pager" wx:if="{{rodTotal > 1}}">
+          <view class="pg-btn {{rodPage <= 1 ? 'dis' : ''}}" bindtap="onRodMixPrev">‹</view>
+          <view class="pg-text">棒 {{rodPage}} / {{rodTotal}}</view>
+          <view class="pg-btn {{rodPage >= rodTotal ? 'dis' : ''}}" bindtap="onRodMixNext">›</view>
         </view>
       </block>
       <block wx:else>
