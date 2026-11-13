@@ -490,6 +490,18 @@
   color: #6b7686;
 }
 
+.mix-tip {
+  font-size: 23rpx;
+  color: #8f9db3;
+  text-align: center;
+  margin: 2rpx 0 8rpx;
+}
+
+.mix-link {
+  color: #1e5eff;
+  text-decoration: underline;
+}
+
 /* 画布 */
 .cut-canvas {
   width: 100%;

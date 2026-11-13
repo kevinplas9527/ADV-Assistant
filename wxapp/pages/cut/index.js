@@ -54,6 +54,9 @@ Page({
     sheetList: [],
     mixPage: 1,
     mixTotal: 0,
+    mixView: "grid",
+    mixIndex: 1,
+    mixRangeText: "",
     legendSpecs: [],
 
     // 切割类型与棒/管
@@ -85,6 +88,7 @@ Page({
     rodBarList: [],
     rodPage: 1,
     rodTotal: 0,
+    rodRangeText: "",
     legendRodSpecs: [],
     voiceState: "idle",
     voiceText: "",
@@ -621,8 +625,11 @@ Page({
       targetShow: "",
       sheetCount: sheets.length,
       sheetList: sheetList,
+      mixView: "grid",
       mixPage: 1,
-      mixTotal: sheets.length,
+      mixIndex: 1,
+      mixTotal: Math.max(1, Math.ceil(sheets.length / 4)),
+      mixRangeText: "1–" + Math.min(4, sheets.length) + " / " + sheets.length + " 张",
       legendSpecs: legendSpecs,
       canvasHeight: 0
     });
@@ -647,25 +654,101 @@ Page({
     });
   },
 
-  // 单张板逐页展示：一次只画当前页，块位与编号看得清，不受板数限制
+  // 混排示意图：grid=一页 4 张概览（点任意一张放大），single=单张大图
   drawMixCut(sheets, W, H) {
     if (!this.canvas || !this.ctx) {
       this.initMixCanvasAndDraw(sheets, W, H);
       return;
     }
     this._mix = { sheets: sheets, W: W, H: H };
+    if (this.data.mixView === "single") {
+      this.drawMixSingle(sheets, W, H);
+    } else {
+      this.drawMixGrid(sheets, W, H);
+    }
+  },
+
+  // 一页 4 张（2×2 缩略），超过 4 张出翻页
+  drawMixGrid(sheets, W, H) {
     const total = sheets.length;
+    const per = 4;
+    const pages = Math.max(1, Math.ceil(total / per));
     let page = this.data.mixPage || 1;
     if (page < 1) page = 1;
-    if (page > total) page = total;
-    const sheet = sheets[page - 1];
+    if (page > pages) page = pages;
+    const start = (page - 1) * per;
+    const list = sheets.slice(start, start + per);
+
+    const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const dpr = info.pixelRatio || 2;
+    const cssW = this.canvasCssWidth || 320;
+    const padX = 8;
+    const gap = 10;
+    const cols = 2;
+    const cellW = (cssW - padX * 2 - gap) / cols;
+    const titleH = 16;
+    const cellH = Math.round(cellW * (H / W));
+    const rowGap = 8;
+    const rows = Math.ceil(list.length / cols);
+    const cssH = rows * (cellH + titleH) + (rows - 1) * rowGap + 8;
+    if (this.data.canvasHeight !== cssH) {
+      this.setData({ canvasHeight: cssH }, () => {
+        setTimeout(() => this.drawMixCut(sheets, W, H), 30);
+      });
+      return;
+    }
+    const pw = Math.round(cssW * dpr);
+    const ph = Math.round(cssH * dpr);
+    this.canvas.width = pw;
+    this.canvas.height = ph;
+    const ctx = this.ctx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, pw, ph);
+    ctx.scale(dpr, dpr);
+
+    this._mixGeo = { cols: cols, cellW: cellW, cellH: cellH, titleH: titleH, padX: padX, gap: gap, rowGap: rowGap, start: start };
+
+    for (let i = 0; i < list.length; i++) {
+      const sheet = list[i];
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      const x0 = padX + col * (cellW + gap);
+      const y0 = row * (cellH + titleH + rowGap);
+      const idx = start + i + 1;
+      let used = 0;
+      sheet.blocks.forEach((b) => { used += b.w * b.h; });
+      ctx.fillStyle = "#6b7686";
+      ctx.font = "10px sans-serif";
+      ctx.fillText("板" + idx + " · " + sheet.blocks.length + " 块 · " + (used / (W * H) * 100).toFixed(0) + "%", x0, y0 + 12);
+
+      const scale = cellW / W;
+      const oy = y0 + titleH;
+      ctx.strokeStyle = "#1e5eff";
+      ctx.lineWidth = 1.4;
+      ctx.strokeRect(x0, oy, cellW, cellH);
+
+      sheet.blocks.forEach((b) => {
+        ctx.strokeStyle = this.specColor(b.spec);
+        ctx.lineWidth = 0.9;
+        ctx.strokeRect(x0 + b.x * scale, oy + b.y * scale, Math.max(1, b.w * scale), Math.max(1, b.h * scale));
+      });
+    }
+  },
+
+  // 单张大图（从概览点进来）
+  drawMixSingle(sheets, W, H) {
+    const total = sheets.length;
+    let index = this.data.mixIndex || 1;
+    if (index < 1) index = 1;
+    if (index > total) index = total;
+    const sheet = sheets[index - 1];
 
     const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
     const dpr = info.pixelRatio || 2;
     const cssW = this.canvasCssWidth || 320;
     const drawW = cssW - 28;
     const boxH = Math.min(300, Math.round(drawW * (H / W)));
-    const cssH = boxH + 36;
+    const cssH = boxH + 38;
     if (this.data.canvasHeight !== cssH) {
       this.setData({ canvasHeight: cssH }, () => {
         setTimeout(() => this.drawMixCut(sheets, W, H), 30);
@@ -683,12 +766,12 @@ Page({
 
     const scale = Math.min(drawW / W, boxH / H);
     const ox = (cssW - W * scale) / 2;
-    const oy = 22;
+    const oy = 24;
     let used = 0;
     sheet.blocks.forEach((b) => { used += b.w * b.h; });
     ctx.fillStyle = "#6b7686";
     ctx.font = "12px sans-serif";
-    ctx.fillText("板" + page + " · " + sheet.blocks.length + " 块 · 利用率 " + (used / (W * H) * 100).toFixed(1) + "%", 8, 14);
+    ctx.fillText("板" + index + " · " + sheet.blocks.length + " 块 · 利用率 " + (used / (W * H) * 100).toFixed(1) + "%", 8, 16);
 
     ctx.strokeStyle = "#1e5eff";
     ctx.lineWidth = 2;
@@ -707,19 +790,78 @@ Page({
     });
   },
 
+  // 概览里点某一格 → 放大该张
+  onMixCanvasTap(e) {
+    if (!this._mix || !this.data.mixMode || this.data.mixView === "single") return;
+    const geo = this._mixGeo;
+    if (!geo) return;
+    const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || {};
+    const x = t.x !== undefined ? t.x : (e.detail && e.detail.x);
+    const y = t.y !== undefined ? t.y : (e.detail && e.detail.y);
+    if (x === undefined || y === undefined) return;
+    const rowH = geo.cellH + geo.titleH + geo.rowGap;
+    const row = Math.floor(y / rowH);
+    const col = Math.floor((x - geo.padX) / (geo.cellW + geo.gap));
+    if (row < 0 || col < 0 || col >= geo.cols) return;
+    const localY = y - row * rowH - geo.titleH;
+    if (localY < 0 || localY > geo.cellH) return;
+    const idx = geo.start + row * geo.cols + col;
+    if (idx >= this._mix.sheets.length) return;
+    this.setData({ mixView: "single", mixIndex: idx + 1 });
+    this.drawMixCut(this._mix.sheets, this._mix.W, this._mix.H);
+  },
+
+  redrawMix() {
+    const m = this._mix;
+    if (m) this.drawMixCut(m.sheets, m.W, m.H);
+  },
+
+  onMixBackGrid() {
+    this.setData({ mixView: "grid" });
+    this.redrawMix();
+  },
+
+  updateMixRange() {
+    const total = this.data.sheetCount || 0;
+    const per = 4;
+    const page = this.data.mixPage || 1;
+    const s = (page - 1) * per + 1;
+    const e = Math.min(page * per, total);
+    this.setData({
+      mixRangeText: s + "–" + e + " / " + total + " 张",
+      mixTotal: Math.max(1, Math.ceil(total / per))
+    });
+  },
+
   onMixPrev() {
-    const page = (this.data.mixPage || 1) - 1;
-    if (page < 1) return;
-    this.setData({ mixPage: page });
-    if (this._mix) this.drawMixCut(this._mix.sheets, this._mix.W, this._mix.H);
+    if (this.data.mixView === "single") {
+      const idx = (this.data.mixIndex || 1) - 1;
+      if (idx < 1) return;
+      this.setData({ mixIndex: idx }, () => this.redrawMix());
+    } else {
+      const page = (this.data.mixPage || 1) - 1;
+      if (page < 1) return;
+      this.setData({ mixPage: page }, () => {
+        this.updateMixRange();
+        this.redrawMix();
+      });
+    }
   },
 
   onMixNext() {
-    const total = this.data.mixTotal || 1;
-    const page = (this.data.mixPage || 1) + 1;
-    if (page > total) return;
-    this.setData({ mixPage: page });
-    if (this._mix) this.drawMixCut(this._mix.sheets, this._mix.W, this._mix.H);
+    if (this.data.mixView === "single") {
+      const total = this.data.sheetCount || 1;
+      const idx = (this.data.mixIndex || 1) + 1;
+      if (idx > total) return;
+      this.setData({ mixIndex: idx }, () => this.redrawMix());
+    } else {
+      const page = (this.data.mixPage || 1) + 1;
+      if (page > (this.data.mixTotal || 1)) return;
+      this.setData({ mixPage: page }, () => {
+        this.updateMixRange();
+        this.redrawMix();
+      });
+    }
   },
 
   // 反算板材长/宽：已知一个方向尺寸，按直排求另一方向最小长度
@@ -1074,7 +1216,8 @@ Page({
       rodBarCount: bars.length,
       rodBarList: barList,
       rodPage: 1,
-      rodTotal: bars.length,
+      rodTotal: Math.max(1, Math.ceil(bars.length / 4)),
+      rodRangeText: "1–" + Math.min(4, bars.length) + " / " + bars.length + " 根",
       legendRodSpecs: legendRodSpecs,
       rodLen: L,
       rodClamp: clamp,
@@ -1106,7 +1249,7 @@ Page({
     });
   },
 
-  // 单根棒/管逐页展示：一次只画当前页，段位与余料看得清，不受根数限制
+  // 一页 4 根棒/管，超过 4 根出翻页
   drawRodMix(bars, L, clamp, k) {
     if (!this.rodCanvas || !this.rodCtx) {
       this.initRodMixCanvasAndDraw(bars, L, clamp, k);
@@ -1114,15 +1257,19 @@ Page({
     }
     this._rodMix = { bars: bars, L: L, clamp: clamp, k: k };
     const total = bars.length;
+    const per = 4;
+    const pages = Math.max(1, Math.ceil(total / per));
     let page = this.data.rodPage || 1;
     if (page < 1) page = 1;
-    if (page > total) page = total;
-    const bar = bars[page - 1];
+    if (page > pages) page = pages;
+    const start = (page - 1) * per;
+    const list = bars.slice(start, start + per);
 
     const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
     const dpr = info.pixelRatio || 2;
     const cssW = this.rodCanvasCssWidth || 320;
-    const cssH = 92;
+    const perH = 58;
+    const cssH = list.length * perH + 6;
     if (this.data.rodCanvasHeight !== cssH) {
       this.setData({ rodCanvasHeight: cssH }, () => {
         setTimeout(() => this.drawRodMix(bars, L, clamp, k), 30);
@@ -1139,61 +1286,81 @@ Page({
     ctx.scale(dpr, dpr);
 
     const scale = (cssW - 16) / L;
-    const barH = 30;
-    const y = 30;
-    let x = 8;
-    const used = bar.end - k;
-    const tail = Math.max(0, L - used);
-    ctx.fillStyle = "#6b7686";
-    ctx.font = "12px sans-serif";
-    ctx.fillText("棒" + page + " · " + bar.segs.length + " 段 · 占用 " + this.formatNum(used) + " mm · 余料 " + this.formatNum(tail) + " mm", 8, 14);
+    const barH = 24;
 
-    if (clamp > 0) {
-      const ww = Math.max(clamp * scale, 1);
-      ctx.fillStyle = "#b8bec9";
-      ctx.fillRect(x, y, ww, barH);
-      x += ww;
-    }
-    for (let i = 0; i < bar.segs.length; i++) {
-      const s = bar.segs[i];
-      const ww = Math.max(s.len * scale, 1);
-      ctx.strokeStyle = this.specColor(s.spec);
-      ctx.lineWidth = 1.2;
-      ctx.strokeRect(x, y, ww, barH);
-      if (ww > 14) {
-        ctx.fillStyle = this.specColor(s.spec);
-        ctx.font = "11px sans-serif";
-        ctx.fillText(String(s.spec + 1), x + 3, y + barH / 2 + 4);
+    for (let i = 0; i < list.length; i++) {
+      const bar = list[i];
+      const top = i * perH;
+      const y = top + 20;
+      let x = 8;
+      const used = bar.end - k;
+      const tail = Math.max(0, L - used);
+      ctx.fillStyle = "#6b7686";
+      ctx.font = "11px sans-serif";
+      ctx.fillText("棒" + (start + i + 1) + " · " + bar.segs.length + " 段 · 余料 " + this.formatNum(tail) + " mm", 8, top + 12);
+
+      if (clamp > 0) {
+        const ww = Math.max(clamp * scale, 1);
+        ctx.fillStyle = "#b8bec9";
+        ctx.fillRect(x, y, ww, barH);
+        x += ww;
       }
-      x += ww;
-      if (i < bar.segs.length - 1) {
-        const kw = Math.max(k * scale, 1);
-        ctx.fillStyle = "#e9edf4";
-        ctx.fillRect(x, y, kw, barH);
-        x += kw;
+      for (let j = 0; j < bar.segs.length; j++) {
+        const s = bar.segs[j];
+        const ww = Math.max(s.len * scale, 1);
+        ctx.strokeStyle = this.specColor(s.spec);
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(x, y, ww, barH);
+        if (ww > 14) {
+          ctx.fillStyle = this.specColor(s.spec);
+          ctx.font = "10px sans-serif";
+          ctx.fillText(String(s.spec + 1), x + 3, y + barH / 2 + 3);
+        }
+        x += ww;
+        if (j < bar.segs.length - 1) {
+          const kw = Math.max(k * scale, 1);
+          ctx.fillStyle = "#e9edf4";
+          ctx.fillRect(x, y, kw, barH);
+          x += kw;
+        }
+      }
+      if (tail > 0.5) {
+        const ww = Math.max(tail * scale, 1);
+        ctx.strokeStyle = "#c3cad6";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, ww, barH);
       }
     }
-    if (tail > 0.5) {
-      const ww = Math.max(tail * scale, 1);
-      ctx.strokeStyle = "#c3cad6";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(x, y, ww, barH);
-    }
+  },
+
+  updateRodRange() {
+    const total = this.data.rodBarCount || 0;
+    const per = 4;
+    const page = this.data.rodPage || 1;
+    const s = (page - 1) * per + 1;
+    const e = Math.min(page * per, total);
+    this.setData({
+      rodRangeText: s + "–" + e + " / " + total + " 根",
+      rodTotal: Math.max(1, Math.ceil(total / per))
+    });
   },
 
   onRodMixPrev() {
     const page = (this.data.rodPage || 1) - 1;
     if (page < 1) return;
-    this.setData({ rodPage: page });
-    if (this._rodMix) this.drawRodMix(this._rodMix.bars, this._rodMix.L, this._rodMix.clamp, this._rodMix.k);
+    this.setData({ rodPage: page }, () => {
+      this.updateRodRange();
+      if (this._rodMix) this.drawRodMix(this._rodMix.bars, this._rodMix.L, this._rodMix.clamp, this._rodMix.k);
+    });
   },
 
   onRodMixNext() {
-    const total = this.data.rodTotal || 1;
     const page = (this.data.rodPage || 1) + 1;
-    if (page > total) return;
-    this.setData({ rodPage: page });
-    if (this._rodMix) this.drawRodMix(this._rodMix.bars, this._rodMix.L, this._rodMix.clamp, this._rodMix.k);
+    if (page > (this.data.rodTotal || 1)) return;
+    this.setData({ rodPage: page }, () => {
+      this.updateRodRange();
+      if (this._rodMix) this.drawRodMix(this._rodMix.bars, this._rodMix.L, this._rodMix.clamp, this._rodMix.k);
+    });
   },
 
   // 结果区不在屏幕内时才平滑滚动过去；已可见则不打扰

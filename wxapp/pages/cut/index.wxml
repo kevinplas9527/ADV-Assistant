@@ -147,11 +147,14 @@
             <view class="legend-box" style="background:{{item.color}}"></view>{{item.label}}（{{item.count}} 块）
           </view>
         </view>
-        <view class="mix-pager" wx:if="{{mixTotal > 1}}">
-          <view class="pg-btn {{mixPage <= 1 ? 'dis' : ''}}" bindtap="onMixPrev">‹</view>
-          <view class="pg-text">板 {{mixPage}} / {{mixTotal}}</view>
-          <view class="pg-btn {{mixPage >= mixTotal ? 'dis' : ''}}" bindtap="onMixNext">›</view>
+        <view class="mix-pager" wx:if="{{mixView === 'single' || mixTotal > 1}}">
+          <view class="pg-btn {{(mixView === 'single' ? mixIndex <= 1 : mixPage <= 1) ? 'dis' : ''}}" bindtap="onMixPrev">‹</view>
+          <view class="pg-text" wx:if="{{mixView === 'single'}}">板 {{mixIndex}} / {{sheetCount}}</view>
+          <view class="pg-text" wx:else>{{mixRangeText}}</view>
+          <view class="pg-btn {{(mixView === 'single' ? mixIndex >= sheetCount : mixPage >= mixTotal) ? 'dis' : ''}}" bindtap="onMixNext">›</view>
         </view>
+        <view class="mix-tip" wx:if="{{mixView === 'single'}}"><text class="mix-link" bindtap="onMixBackGrid">← 返回 4 张概览</text></view>
+        <view class="mix-tip" wx:elif="{{mixTotal > 1}}">点击任一板可放大查看</view>
       </block>
       <block wx:else>
         <view class="cut-count">可切 <text class="cut-num">{{count}}</text> 块<text class="cut-target" wx:if="{{targetShow}}">{{targetShow}}</text></view>
@@ -162,7 +165,7 @@
           <view class="legend-item"><view class="legend-box legend-rot"></view>旋转块</view>
         </view>
       </block>
-      <canvas type="2d" id="cutCanvas" class="cut-canvas" style="height:{{canvasHeight}}px"></canvas>
+      <canvas type="2d" id="cutCanvas" class="cut-canvas" bindtap="onMixCanvasTap" style="height:{{canvasHeight}}px"></canvas>
     </block>
 
     <!-- 棒/管结果 -->
@@ -181,7 +184,7 @@
         </view>
         <view class="mix-pager" wx:if="{{rodTotal > 1}}">
           <view class="pg-btn {{rodPage <= 1 ? 'dis' : ''}}" bindtap="onRodMixPrev">‹</view>
-          <view class="pg-text">棒 {{rodPage}} / {{rodTotal}}</view>
+          <view class="pg-text">{{rodRangeText}}</view>
           <view class="pg-btn {{rodPage >= rodTotal ? 'dis' : ''}}" bindtap="onRodMixNext">›</view>
         </view>
       </block>
