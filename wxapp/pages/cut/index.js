@@ -1168,14 +1168,20 @@ Page({
     }
   },
 
-  // 结果生成后平滑滚动到结果区，免去用户手动下拉
+  // 结果区不在屏幕内时才平滑滚动过去；已可见则不打扰
   scrollToResult(sel) {
     const q = wx.createSelectorQuery();
     q.select(sel).boundingClientRect();
     q.selectViewport().scrollOffset();
     q.exec((res) => {
       if (!res || !res[0] || !res[1]) return;
-      const top = Math.max(0, res[0].top + res[1].scrollTop - 10);
+      const rect = res[0];
+      if (!rect || !rect.height) return;
+      const info = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+      const vh = info.windowHeight || 600;
+      // 结果区顶部还没进入视口上部区域才滚；已可见或已滚到上方都不打扰
+      if (!(rect.top > vh * 0.55)) return;
+      const top = Math.max(0, rect.top + res[1].scrollTop - 10);
       wx.pageScrollTo({ scrollTop: top, duration: 400 });
     });
   },
