@@ -308,6 +308,98 @@
   margin-bottom: 6rpx;
 }
 
+/* 每张板 / 每根棒明细 */
+.sheet-list {
+  margin: 6rpx 0 2rpx;
+}
+
+.sheet-item {
+  font-size: 25rpx;
+  color: #4a5568;
+  line-height: 1.8;
+}
+
+/* 下料规格列表 */
+.spec-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 14rpx 0 8rpx;
+}
+
+.spec-title {
+  font-size: 28rpx;
+  color: #1b2a4a;
+  font-weight: 700;
+}
+
+.spec-add {
+  font-size: 24rpx;
+  color: #1e5eff;
+  padding: 4rpx 0 4rpx 12rpx;
+}
+
+.spec-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.spec-tag {
+  flex: none;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  border: 1.5rpx solid #d5dde9;
+  border-radius: 50%;
+  margin-right: 10rpx;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.spec-in {
+  flex: 1;
+  min-width: 0;
+  height: 58rpx;
+  min-height: 58rpx;
+  padding: 6rpx 12rpx;
+  border: 1.5rpx solid #c4cedb;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background: #fff;
+  box-sizing: border-box;
+  margin-right: 8rpx;
+}
+
+.spec-in.spec-qty {
+  flex: 0 0 128rpx;
+  font-size: 27rpx;
+}
+
+.spec-in.spec-len {
+  flex: 1;
+}
+
+.spec-del {
+  flex: none;
+  width: 40rpx;
+  height: 58rpx;
+  line-height: 58rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: #b8bec9;
+}
+
+.spec-tip {
+  font-size: 22rpx;
+  color: #8f9db3;
+  line-height: 1.5;
+  margin: 2rpx 0 12rpx;
+}
+
 /* 图例 */
 .cut-legend {
   display: flex;

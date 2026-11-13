@@ -43,16 +43,6 @@
       </view>
       <view class="form-grid two">
         <view class="field">
-          <view class="label">下料长（mm）</view>
-          <input placeholder-class="input-ph" type="digit" value="{{blockL}}" data-field="blockL" bindinput="onInput" placeholder="如 90" />
-        </view>
-        <view class="field">
-          <view class="label">下料宽（mm）</view>
-          <input placeholder-class="input-ph" type="digit" value="{{blockW}}" data-field="blockW" bindinput="onInput" placeholder="如 100" />
-        </view>
-      </view>
-      <view class="form-grid two">
-        <view class="field">
           <view class="label">板材厚度（mm）</view>
           <input placeholder-class="input-ph" type="digit" value="{{cutThickness}}" data-field="cutThickness" bindinput="onCutThicknessInput" placeholder="如 20" />
         </view>
@@ -68,7 +58,20 @@
         <view class="pm-dim pm-w" style="position: absolute; left: 158rpx; top: 46rpx">宽 {{plateW || '—'}}</view>
         <view class="pm-dim pm-t" style="position: absolute; left: 424rpx; top: 87rpx; width: 95rpx; height: 37rpx; display: block; box-sizing: border-box">厚 {{cutThickness || '—'}}</view>
       </view>
-      <view class="form-grid">
+      <!-- 下料规格（单规格即原下料长宽；多条或填数量走混排） -->
+      <view class="spec-hd">
+        <view class="spec-title">下料规格</view>
+        <view class="spec-add" wx:if="{{blockSpecs.length < 5}}" bindtap="onAddBlockSpec">＋ 添加规格</view>
+      </view>
+      <view class="spec-row" wx:for="{{blockSpecs}}" wx:key="id">
+        <view class="spec-tag" style="color:{{index === 0 ? '#1e5eff' : index === 1 ? '#f08c00' : index === 2 ? '#2f9e44' : index === 3 ? '#7048e8' : '#c92a2a'}}">{{index + 1}}</view>
+        <input class="spec-in" placeholder-class="input-ph" type="digit" value="{{item.l}}" data-index="{{index}}" data-key="l" bindinput="onBlockSpecInput" placeholder="长 如 90" />
+        <input class="spec-in" placeholder-class="input-ph" type="digit" value="{{item.w}}" data-index="{{index}}" data-key="w" bindinput="onBlockSpecInput" placeholder="宽 如 100" />
+        <input class="spec-in spec-qty" placeholder-class="input-ph" type="number" value="{{item.qty}}" data-index="{{index}}" data-key="qty" bindinput="onBlockSpecInput" placeholder="数量" />
+        <view class="spec-del" wx:if="{{blockSpecs.length > 1}}" data-index="{{index}}" catchtap="onDelBlockSpec">×</view>
+      </view>
+      <view class="spec-tip">只填一条且数量留空：按整板算可切块数；填数量或多条规格：混排，算需几张板</view>
+      <view class="form-grid" wx:if="{{blockSpecs.length === 1 && !blockSpecs[0].qty}}">
         <view class="field" style="flex: 1">
           <view class="label">目标块数（反算用）</view>
           <input placeholder-class="input-ph" class="{{targetNEdited ? 'edited' : ''}}" type="number" value="{{targetN}}" data-field="targetN" bindinput="onTargetNInput" placeholder="留空按常规测算" />
@@ -91,22 +94,12 @@
       </view>
       <view class="form-grid two">
         <view class="field">
-          <view class="label">下料长度（mm）</view>
-          <input placeholder-class="input-ph" type="digit" value="{{rodPiece}}" data-field="rodPiece" bindinput="onRodInput" placeholder="如 40" />
-        </view>
-        <view class="field">
           <view class="label">夹持长度（mm）</view>
           <input placeholder-class="input-ph" type="digit" value="{{rodClamp}}" data-field="rodClamp" bindinput="onRodInput" placeholder="{{rodClampPlaceholder}}" />
         </view>
-      </view>
-      <view class="form-grid two">
         <view class="field">
           <view class="label">刀缝（mm）</view>
           <input placeholder-class="input-ph" type="digit" value="{{rodKerf}}" data-field="rodKerf" bindinput="onRodInput" placeholder="{{rodKerfPlaceholder}}" />
-        </view>
-        <view class="field">
-          <view class="label">目标件数（反算用）</view>
-          <input placeholder-class="input-ph" class="{{rodTargetNEdited ? 'edited' : ''}}" type="number" value="{{rodTargetN}}" data-field="rodTargetN" bindinput="onRodTargetNInput" placeholder="留空按常规测算" />
         </view>
       </view>
       <!-- 棒/管 3D 模型示意（随输入实时更新） -->
@@ -114,6 +107,24 @@
         <image class="pm-img" src="/images/icon-rod.png" mode="aspectFit"></image>
         <view class="pm-dim pm-l" style="position: absolute; left: 204rpx; top: 87rpx; width: 135rpx; height: 37rpx; display: block; box-sizing: border-box">长度 {{rodLen || '—'}}</view>
         <view class="pm-dim pm-w" style="position: absolute; left: 279rpx; top: 173rpx">直径 {{rodDia || '—'}}</view>
+      </view>
+      <!-- 下料长度规格 -->
+      <view class="spec-hd">
+        <view class="spec-title">下料长度规格</view>
+        <view class="spec-add" wx:if="{{rodSpecs.length < 5}}" bindtap="onAddRodSpec">＋ 添加规格</view>
+      </view>
+      <view class="spec-row" wx:for="{{rodSpecs}}" wx:key="id">
+        <view class="spec-tag" style="color:{{index === 0 ? '#1e5eff' : index === 1 ? '#f08c00' : index === 2 ? '#2f9e44' : index === 3 ? '#7048e8' : '#c92a2a'}}">{{index + 1}}</view>
+        <input class="spec-in spec-len" placeholder-class="input-ph" type="digit" value="{{item.len}}" data-index="{{index}}" data-key="len" bindinput="onRodSpecInput" placeholder="下料长度 如 40" />
+        <input class="spec-in spec-qty" placeholder-class="input-ph" type="number" value="{{item.qty}}" data-index="{{index}}" data-key="qty" bindinput="onRodSpecInput" placeholder="数量" />
+        <view class="spec-del" wx:if="{{rodSpecs.length > 1}}" data-index="{{index}}" catchtap="onDelRodSpec">×</view>
+      </view>
+      <view class="spec-tip">只填一条且数量留空：算单根能切几件；填数量或多条规格：混排，算需几根材料</view>
+      <view class="form-grid" wx:if="{{rodSpecs.length === 1 && !rodSpecs[0].qty}}">
+        <view class="field" style="flex: 1">
+          <view class="label">目标件数（反算用）</view>
+          <input placeholder-class="input-ph" class="{{rodTargetNEdited ? 'edited' : ''}}" type="number" value="{{rodTargetN}}" data-field="rodTargetN" bindinput="onRodTargetNInput" placeholder="留空按常规测算" />
+        </view>
       </view>
       <button class="calc-btn" bindtap="onRodCut">测 算</button>
     </block>
@@ -125,28 +136,56 @@
     <!-- 板材结果 -->
     <block wx:if="{{cutType === 'plate'}}">
       <view class="solve-msg {{cutMsgWarn ? 'warn' : ''}}" wx:if="{{cutMsg}}">{{cutMsg}}</view>
-      <view class="cut-count">可切 <text class="cut-num">{{count}}</text> 块<text class="cut-target" wx:if="{{targetShow}}">{{targetShow}}</text></view>
-      <view class="cut-meta">排样：{{mode}} ｜ 板材 {{plateL}}×{{plateW}} mm ｜ 单块 {{blockL}}×{{blockW}} mm ｜ 刀缝 {{kerf}} mm</view>
-      <view class="cut-meta">材料利用率 {{ratio}}% ｜ 余料 {{waste}} mm²</view>
-      <view class="cut-legend">
-        <view class="legend-item"><view class="legend-box legend-fwd"></view>正向块</view>
-        <view class="legend-item"><view class="legend-box legend-rot"></view>旋转块</view>
-      </view>
+      <block wx:if="{{mixMode}}">
+        <view class="cut-count">共切 <text class="cut-num">{{count}}</text> 块 · 需 <text class="cut-num">{{sheetCount}}</text> 张板</view>
+        <view class="cut-meta">板材 {{plateL}}×{{plateW}} mm ｜ 刀缝 {{kerf}} mm ｜ 总利用率 {{ratio}}%</view>
+        <view class="sheet-list">
+          <view class="sheet-item" wx:for="{{sheetList}}" wx:key="idx">板{{item.idx}} · {{item.blocks}} 块 · 利用率 {{item.ratio}}%</view>
+        </view>
+        <view class="cut-legend">
+          <view class="legend-item" wx:for="{{legendSpecs}}" wx:key="label">
+            <view class="legend-box" style="background:{{item.color}}"></view>{{item.label}}（{{item.count}} 块）
+          </view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="cut-count">可切 <text class="cut-num">{{count}}</text> 块<text class="cut-target" wx:if="{{targetShow}}">{{targetShow}}</text></view>
+        <view class="cut-meta">排样：{{mode}} ｜ 板材 {{plateL}}×{{plateW}} mm ｜ 单块 {{blockSpecs[0].l}}×{{blockSpecs[0].w}} mm ｜ 刀缝 {{kerf}} mm</view>
+        <view class="cut-meta">材料利用率 {{ratio}}% ｜ 余料 {{waste}} mm²</view>
+        <view class="cut-legend">
+          <view class="legend-item"><view class="legend-box legend-fwd"></view>正向块</view>
+          <view class="legend-item"><view class="legend-box legend-rot"></view>旋转块</view>
+        </view>
+      </block>
       <canvas type="2d" id="cutCanvas" class="cut-canvas" style="height:{{canvasHeight}}px"></canvas>
     </block>
 
     <!-- 棒/管结果 -->
     <block wx:if="{{cutType === 'rod'}}">
       <view class="solve-msg {{rodMsgWarn ? 'warn' : ''}}" wx:if="{{rodMsg}}">{{rodMsg}}</view>
-      <view class="cut-count">可切 <text class="cut-num">{{rodCount}}</text> 件<text class="cut-target" wx:if="{{rodTargetShow}}">{{rodTargetShow}}</text></view>
-      <view class="cut-meta">棒/管材料 {{rodLen}} mm ｜ 单件 {{rodPiece}} mm ｜ 夹持 {{rodClamp}} mm ｜ 刀缝 {{rodKerf}} mm</view>
-      <view class="cut-meta">占用 {{rodUsed}} mm（夹持 {{rodClamp}} + {{rodCount}}×{{rodPiece}} + {{rodKerfCount}}×{{rodKerf}}）｜ 余料 {{rodTail}} mm</view>
-      <view class="cut-meta">材料利用率 {{rodRatio}}%</view>
-      <view class="cut-legend">
-        <view class="legend-item"><view class="legend-box legend-fwd"></view>单件</view>
-        <view class="legend-item"><view class="legend-box legend-clamp"></view>夹持</view>
-        <view class="legend-item"><view class="legend-line"></view>刀缝</view>
-      </view>
+      <block wx:if="{{rodMixMode}}">
+        <view class="cut-count">共切 <text class="cut-num">{{rodMixCount}}</text> 段 · 需 <text class="cut-num">{{rodBarCount}}</text> 根材料</view>
+        <view class="cut-meta">材料 {{rodLen}} mm ｜ 夹持 {{rodClamp}} mm ｜ 刀缝 {{rodKerf}} mm ｜ 总利用率 {{rodRatio}}%</view>
+        <view class="sheet-list">
+          <view class="sheet-item" wx:for="{{rodBarList}}" wx:key="idx">棒{{item.idx}} · {{item.count}} 段 · 占用 {{item.used}} mm · 余料 {{item.tail}} mm</view>
+        </view>
+        <view class="cut-legend">
+          <view class="legend-item" wx:for="{{legendRodSpecs}}" wx:key="label">
+            <view class="legend-box" style="background:{{item.color}}"></view>{{item.label}}（{{item.count}} 段）
+          </view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="cut-count">可切 <text class="cut-num">{{rodCount}}</text> 件<text class="cut-target" wx:if="{{rodTargetShow}}">{{rodTargetShow}}</text></view>
+        <view class="cut-meta">棒/管材料 {{rodLen}} mm ｜ 单件 {{rodPiece}} mm ｜ 夹持 {{rodClamp}} mm ｜ 刀缝 {{rodKerf}} mm</view>
+        <view class="cut-meta">占用 {{rodUsed}} mm（夹持 {{rodClamp}} + {{rodCount}}×{{rodPiece}} + {{rodKerfCount}}×{{rodKerf}}）｜ 余料 {{rodTail}} mm</view>
+        <view class="cut-meta">材料利用率 {{rodRatio}}%</view>
+        <view class="cut-legend">
+          <view class="legend-item"><view class="legend-box legend-fwd"></view>单件</view>
+          <view class="legend-item"><view class="legend-box legend-clamp"></view>夹持</view>
+          <view class="legend-item"><view class="legend-line"></view>刀缝</view>
+        </view>
+      </block>
       <canvas type="2d" id="rodCanvas" class="cut-canvas" style="height:{{rodCanvasHeight}}px"></canvas>
     </block>
   </view>
